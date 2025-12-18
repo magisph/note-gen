@@ -25,7 +25,20 @@
     "success": "Sucesso",
     "error": "Falha",
     "defaultFileName": "Sem Título",
-    "restartToApply": ", por favor reinicie o aplicativo para que a configuração entre em vigor"
+    "restartToApply": ", por favor reinicie o aplicativo para que a configuração entre em vigor",
+    "close": "Fechar",
+    "open": "Abrir",
+    "add": "Adicionar",
+    "remove": "Remover",
+    "search": "Pesquisar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "export": "Exportar",
+    "import": "Importar",
+    "refresh": "Atualizar",
+    "loading": "Carregando...",
+    "warning": "Aviso",
+    "info": "Informação"
   },
   "settings": {
     "others": "Avançado",
@@ -50,7 +63,7 @@
         "scale": {
           "title": "Escala da Interface",
           "desc": "Ajuste a escala geral da interface do aplicativo",
-          "placeholder": "Selecione a proporção da escala"
+          "placeholder": "Selecione a escala da interface"
         },
         "contentTextScale": {
           "title": "Escala do Conteúdo",
@@ -110,7 +123,8 @@
       "similarityThreshold": "Limiar de Similaridade",
       "similarityThresholdDesc": "O limiar mínimo de similaridade entre documentos e consultas. Apenas documentos que excederem este limiar serão retornados. O valor varia de 0.0 a 1.0; quanto maior o limiar, mais rigoroso o requisito.",
       "resetToDefaults": "Redefinir para Padrões",
-      "deleteVector": "Limpar Base de Conhecimento"
+      "deleteVector": "Limpar Base de Conhecimento",
+      "topPDesc": "O parâmetro Top P controla a diversidade do texto gerado pelo modelo. Quanto menor o valor, mais determinístico será o texto; quanto maior o valor, mais diverso será o texto gerado."
     },
     "mcp": {
       "title": "MCP",
@@ -274,7 +288,8 @@
           "title": "Modelo de Reordenação",
           "desc": "Usado para reordenar e otimizar resultados de busca."
         }
-      }
+      },
+      "mainModel": "Modelo Principal"
     },
     "audio": {
       "title": "Configurações de Áudio",
@@ -400,7 +415,8 @@
         "downloadSuccess": "Configurações baixadas com sucesso",
         "downloadFailed": "Falha ao baixar configurações",
         "autoSync": "As configurações serão sincronizadas automaticamente durante o upload/download (excluindo configurações específicas do dispositivo como o caminho do workspace)"
-      }
+      },
+      "jsdelivrSettingDesc": "Use jsdelivr para acelerar o acesso às imagens."
     },
     "imageHosting": {
       "title": "Hospedagem de Imagens",
@@ -444,7 +460,9 @@
         "recheckRepo": "Verificar Novamente",
         "recheckingRepo": "Verificando...",
         "createRepo": "Criar Repositório",
-        "creatingRepo": "Criando..."
+        "creatingRepo": "Criando...",
+        "desc": "Usar repositório GitHub como serviço de hospedagem de imagens",
+        "tokenPlaceholder": "Digite o GitHub Access Token"
       },
       "s3": {
         "title": "Armazenamento de Objetos S3",
@@ -498,6 +516,10 @@
       "vlm": {
         "title": "Modelo de Linguagem Visual",
         "desc": "Use o modelo de linguagem visual para reconhecer o conteúdo da imagem."
+      },
+      "enable": {
+        "title": "Habilitar Reconhecimento de Imagem",
+        "desc": "Quando habilitado, o reconhecimento de imagem será executado automaticamente ao fazer registros de captura de tela e inserção de imagem. Quando desabilitado, a etapa de reconhecimento de imagem será ignorada."
       }
     },
     "backupSync": {
@@ -648,62 +670,72 @@
       "deleteCustomModel": "Excluir",
       "deleteCustomModelConfirm": "Tem certeza de que deseja excluir este modelo personalizado?",
       "copyConfig": "Copiar",
-      "builtin": "Embutido",
+      "builtin": "Integrado",
       "modelSupport": "Suporta apenas modelos de IA com protocolo OpenAI",
-      "apiKeyUrl": "Criar Chave de API",
+      "apiKeyUrl": "Criar Chave API",
       "modelType": {
         "title": "Tipo de Modelo",
-        "desc": "Selecione o tipo de modelo de IA com base em sua capacidade",
-        "chat": "Bate-papo",
-        "image": "Imagem",
+        "desc": "Selecione o tipo de modelo com base nas capacidades do modelo de IA para chamar diferentes interfaces.",
+        "chat": "Conversação",
+        "image": "Geração de Imagem",
         "video": "Vídeo",
-        "tts": "Texto para Fala (TTS)",
-        "stt": "Fala para Texto (STT)",
-        "embedding": "Embedding",
+        "tts": "Texto para Fala",
+        "stt": "Fala para Texto",
+        "embedding": "Incorporação",
         "rerank": "Reordenação"
       },
       "modelList": {
         "error": {
           "title": "Falha ao obter lista de modelos",
-          "description": "Por favor, verifique se a Chave de API ou a rede estão corretas"
+          "description": "Verifique se a Chave API ou a rede estão corretos"
         }
       },
-      "selectModel": "Por favor, selecione um modelo",
+      "selectModel": "Selecione o modelo",
       "modelProviderDesc": "Modelos personalizados suportam apenas modelos de IA com protocolo OpenAI.",
-      "modelTitleDesc": "Nome personalizado, usado para identificar modelos de IA, por favor, não repita.",
-      "modelBaseUrlDesc": "Você só precisa configurar o número da versão, por exemplo: https://api.openai.com/v1, o sufixo será adicionado automaticamente.",
-      "modelDesc": "Alguns modelos suportam a obtenção da lista de modelos, se não for suportado, por favor, configure manualmente.",
-      "temperatureDesc": "Controla a aleatoriedade da saída. Valores mais baixos tornam o conteúdo gerado mais determinístico.",
-      "topPDesc": "Um método de amostragem nucleus, onde o modelo considera os resultados dos tokens com massa de probabilidade top_p. Então, 0.1 significa considerar apenas os 10% superiores da massa de probabilidade. Geralmente, sugerimos alterar este ou a temperatura, mas não ambos.",
-      "customHeaders": "Cabeçalhos Personalizados",
-      "customHeadersDesc": "Adicione cabeçalhos HTTP personalizados com pares chave-valor.",
+      "modelTitleDesc": "Nome personalizado para identificar o modelo de IA, não deve ser duplicado.",
+      "modelBaseUrlDesc": "Você só precisa configurar até o número da versão, por exemplo: https://api.openai.com/v1, o sufixo será adicionado automaticamente.",
+      "modelDesc": "Alguns modelos suportam obtenção de lista de modelos. Se não houver suporte, configure manualmente.",
+      "temperatureDesc": "Temperatura de amostragem a ser usada, entre 0 e 2. Valores mais altos (como 0.8) tornarão a saída mais aleatória, enquanto valores mais baixos (como 0.2) tornarão a saída mais focada e determinística. Geralmente recomendamos alterar isso ou top_p, mas não ambos.",
+      "topPDesc": "Uma alternativa à amostragem de temperatura, chamada amostragem de núcleo, onde o modelo considera os resultados dos tokens com massa de probabilidade top_p. Portanto, 0.1 significa considerar apenas os tokens que compõem os 10% superiores da massa de probabilidade. Geralmente recomendamos alterar isso ou temperature, mas não ambos.",
+      "customHeaders": "Cabeçalhos de Requisição Personalizados",
+      "customHeadersDesc": "Adicione cabeçalhos de requisição HTTP personalizados, suporta configuração de múltiplos pares chave-valor.",
       "headerKey": "Chave",
       "headerValue": "Valor",
       "addHeader": "Adicionar Cabeçalho",
-      "connectionSuccess": "Teste de conexão com IA bem-sucedido",
+      "connectionSuccess": "Teste de conexão da IA bem-sucedido",
       "voice": "Tipo de Voz",
-      "voiceDesc": "Especifique o tipo de voz para modelos de áudio, como 'alloy', 'echo', 'fable', etc.",
-      "voicePlaceholder": "Insira o tipo de voz, ex: alloy",
+      "voiceDesc": "Especifique o tipo de voz a ser usado pelo modelo de áudio, como 'alloy', 'echo', 'fable', etc.",
+      "voicePlaceholder": "Digite o tipo de voz, por exemplo: alloy",
       "defaultModels": {
         "title": "Modelos Gratuitos Padrão",
-        "desc": "O NoteGen fornece serviços de modelo de IA gratuitos para usuários, permitindo funcionalidade básica sem configuração.",
+        "desc": "NoteGen fornece serviços de modelo de IA gratuitos para os usuários, alimentados por SiliconFlow. Os recursos básicos podem ser usados sem configuração.",
         "chatModel": {
           "name": "Qwen/Qwen3-8B",
-          "type": "Modelo de Chat",
-          "desc": "Adequado para conversas diárias e geração de texto"
+          "type": "Modelo de Conversação",
+          "desc": "Adequado para conversação diária, geração de texto e outros cenários"
         },
         "embeddingModel": {
           "name": "BAAI/bge-m3",
-          "type": "Modelo de Embedding",
-          "desc": "Usado para vetorização de texto e busca semântica"
+          "type": "Modelo de Incorporação",
+          "desc": "Usado para vetorização de texto, busca semântica e outras funções"
         },
         "visionModel": {
           "name": "THUDM/GLM-4.1V-9B-Thinking",
           "type": "Modelo de Visão",
-          "desc": "Suporta compreensão de imagem e reconhecimento OCR"
+          "desc": "Suporta compreensão de imagem, reconhecimento OCR e outras tarefas de visão"
         },
-        "poweredBy": "Fornecido por SiliconFlow"
-      }
+        "poweredBy": "Tecnologia fornecida por SiliconFlow"
+      },
+      "connectionFailed": "Falha na conexão",
+      "enableStream": "Resposta em Stream",
+      "enableStreamDesc": "Habilitar resposta em stream permite exibir conteúdo gerado em tempo real, mas alguns modelos podem não suportar este recurso.",
+      "selectConfig": "Selecione a configuração",
+      "models": "Lista de Modelos",
+      "modelsDesc": "Gerencie todos os modelos na configuração atual. Cada modelo pode ter diferentes tipos e parâmetros.",
+      "addModel": "Adicionar Modelo",
+      "newModel": "Novo Modelo",
+      "checkConnection": "Testar Conexão",
+      "model": "Modelo"
     },
     "ocr": {
       "title": "OCR",
@@ -784,7 +816,8 @@
       "recording": "Gravando...",
       "recorded": "Gravado",
       "record": "Gravar",
-      "detected": "Detectado"
+      "detected": "Detectado",
+      "save": "Salvar"
     },
     "mark": {
       "empty": "Nenhum registro ainda",
@@ -859,11 +892,15 @@
         "chat": {
           "placeholder": {
             "default": "Faça perguntas ou organize suas notas em um artigo...",
-            "noApiKey": "Chave de API não configurada, recurso de chat com IA indisponível..."
+            "noApiKey": "Chave de API não configurada, recurso de chat com IA indisponível...",
+            "off": "Sugestão de IA (desativada)",
+            "on": "Sugestão de IA (ativada)"
           },
           "header": {
             "configApiKey": "Configurar CHAVE DE API",
-            "clearChat": "Limpar Chat"
+            "clearChat": "Limpar Chat",
+            "configPrompt": "Configurar Prompt",
+            "selectPrompt": "Selecionar Prompt"
           },
           "clipboard": {
             "image": {
@@ -904,12 +941,7 @@
             "error": "Falha"
           },
           "empty": {
-            "features": {
-              "linked": "Vinculado aos seus registros ou notas",
-              "chat": "Converse com o bot de IA",
-              "organize": "Organize seus registros em notas",
-              "clipboard": "Reconhecer registros ou imagens da área de transferência"
-            }
+            "features": "Recursos disponíveis: conversação com IA, organização de registros, reconhecimento de área de transferência"
           },
           "content": {
             "organize": "Organize seus registros em um artigo:"
@@ -936,7 +968,28 @@
             "recorded": "Gravado",
             "record": "Gravar"
           },
-          "send": "Enviar"
+          "send": "Enviar",
+          "agent": {
+            "acting": "Executando",
+            "confirmation": {
+              "cancel": "Cancelar",
+              "cancelled": "Cancelado",
+              "confirm": "Confirmar",
+              "confirmed": "Confirmado",
+              "description": "O Agent deseja executar a seguinte operação, confirme para continuar.",
+              "parameters": "Parâmetros",
+              "title": "Confirmar Operação",
+              "tool": "Ferramenta"
+            },
+            "observation": "Resultado da Observação",
+            "running": "Agent em execução",
+            "thinking": "Pensando",
+            "toolCalls": "Chamada de Ferramentas"
+          },
+          "modeSelect": {
+            "agent": "Agente Inteligente",
+            "chat": "Conversa"
+          }
         },
         "text": {
           "title": "Gravar Texto",
@@ -1012,17 +1065,26 @@
         "scan": "Digitalizar Imagem",
         "image": "Carregar Imagem",
         "link": "Gravar Link",
-        "file": "Carregar Arquivo"
+        "file": "Carregar Arquivo",
+        "closeTrash": "Fechar Lixeira"
+      },
+      "imageGallery": {
+        "collapse": "Recolher",
+        "expand": "Expandir"
+      },
+      "note": {
+        "cancel": "Cancelar",
+        "confirm": "Confirmar",
+        "organizeAs": "Organizar como",
+        "removeThinking": "Remover processo de pensamento",
+        "setting": "Configurações",
+        "stop": "Parar",
+        "template": "Modelo"
       }
     },
     "chat": {
       "empty": {
-        "features": {
-          "linked": "Vinculado aos seus registros ou notas",
-          "chat": "Converse com o bot de IA",
-          "organize": "Organize seus registros em notas",
-          "clipboard": "Reconhecer registros ou imagens da área de transferência"
-        }
+        "features": "Recursos disponíveis: converse com IA, organize registros, reconheça área de transferência"
       },
       "newChat": "Novo Chat com Nova Tag",
       "removeChat": "Remover Chat com Tag Atual",
@@ -1050,7 +1112,8 @@
         "filterThinkingContent": "Remover conteúdo de 'pensamento' dos registros",
         "startOrganize": "Começar a organizar",
         "manageTemplate": "Gerenciar template",
-        "cancel": "Cancelar"
+        "cancel": "Cancelar",
+        "stop": "Parar"
       },
       "mark": {
         "recorded": "Gravado",
@@ -1080,58 +1143,77 @@
         "stop": "Parar",
         "terminate": "Terminar",
         "tagLink": {
-          "on": "Vinculado à tag",
-          "off": "Não vinculado à tag"
+          "on": "Tag associada",
+          "off": "Tag não associada"
         },
         "modelSelect": {
-          "tooltip": "Selecionar modelo de IA",
-          "placeholder": "Pesquisar modelos de IA",
-          "noModel": "Nenhum modelo encontrado"
+          "tooltip": "Selecionar Modelo de IA",
+          "placeholder": "Pesquisar Modelo de IA",
+          "noModel": "Modelo não encontrado"
         },
         "promptSelect": {
-          "tooltip": "Selecionar prompt",
-          "placeholder": "Pesquisar prompts"
+          "tooltip": "Selecionar Prompt",
+          "placeholder": "Pesquisar Prompt"
         },
         "clearChat": "Limpar Chat",
         "clearContext": {
-          "tooltip": "Limpar contexto"
+          "tooltip": "Limpar Contexto"
         },
         "mcp": {
           "tooltip": "Servidor MCP"
         },
         "chatLanguage": {
-          "tooltip": "Selecionar idioma do chat",
+          "tooltip": "Selecionar Idioma da Conversa",
           "placeholder": "Pesquisar idioma"
         },
         "rag": {
-          "notSupported": "Modelo vetorial não é suportado",
-          "enabled": "Busca na Base de Conhecimento (Habilitada)",
-          "disabled": "Busca na Base de Conhecimento (Desabilitada)"
+          "notSupported": "Modelo de vetor não disponível",
+          "enabled": "Busca na Base de Conhecimento (ativada)",
+          "disabled": "Busca na Base de Conhecimento (desativada)"
         },
         "modeSelect": {
-          "tooltip": "Selecionar modo de entrada",
-          "chat": "Modo Chat",
-          "gen": "Modo Organizar",
-          "translate": "Modo Traduzir"
+          "tooltip": "Selecionar Modo de Entrada",
+          "chat": "Modo de Conversa",
+          "gen": "Modo de Organização",
+          "translate": "Modo de Tradução"
         },
         "chatModeSelect": {
           "chatDescription": "Conversa rápida, modo somente leitura",
-          "agentDescription": "Assistente inteligente, pode executar ações"
+          "agentDescription": "Assistente inteligente, pode executar operações"
         },
         "fileLink": {
-          "tooltip": "Vincular Arquivo",
+          "tooltip": "Associar Arquivo",
           "selectFile": "Selecionar Arquivo",
-          "linkedFile": "Arquivo Vinculado",
-          "searchPlaceholder": "Pesquisar arquivos...",
-          "noFiles": "Nenhum arquivo encontrado",
+          "linkedFile": "Arquivo Associado",
+          "searchPlaceholder": "Pesquisar arquivo...",
+          "noFiles": "Arquivo não encontrado",
           "loading": "Carregando..."
+        },
+        "stopped": "Conversa interrompida",
+        "agent": {
+          "acting": "Executando",
+          "confirmation": {
+            "cancel": "Cancelar",
+            "cancelled": "Cancelado",
+            "confirm": "Confirmar",
+            "confirmed": "Confirmado",
+            "description": "O Agent deseja executar a seguinte operação, confirme para continuar.",
+            "parameters": "Parâmetros",
+            "title": "Confirmar Operação",
+            "tool": "Ferramenta"
+          },
+          "observation": "Resultado da Observação",
+          "running": "Agent em execução",
+          "thinking": "Pensando",
+          "toolCalls": "Chamada de Ferramentas"
         }
       },
       "header": {
         "configApiKey": "Configurar CHAVE DE API",
         "clearChat": "Limpar Chat",
         "selectPrompt": "Selecionar Prompt",
-        "noModel": "Modelo de IA não selecionado"
+        "noModel": "Modelo de IA não selecionado",
+        "configPrompt": "Configurar Prompt"
       },
       "clipboard": {
         "image": {
@@ -1177,6 +1259,23 @@
       "delete": "Excluir Tag",
       "deleteConfirm": "Tem certeza de que deseja excluir esta tag?",
       "placeholder": "Insira o nome da tag"
+    },
+    "action": {
+      "convert": {
+        "selectFolder": "Selecionar Pasta",
+        "rootDirectory": "Diretório Raiz",
+        "deleteTag": "Excluir tag atual, registros e notas (recuperável da lixeira)",
+        "warning": "Após a conversão, você será redirecionado para a página de escrita.",
+        "convert_button": "Converter"
+      },
+      "mark": {
+        "recorded": "Registrado",
+        "record": "Registrar"
+      },
+      "send": "Enviar"
+    },
+    "toolbar": {
+      "closeTrash": "Fechar Lixeira"
     }
   },
   "search": {
@@ -1335,8 +1434,10 @@
           "description": "Traduzir o texto selecionado",
           "selectContent": "Por favor, selecione o conteúdo primeiro",
           "promptTemplate": "Traduzir este texto: \n{content}\n, para {language}, retorne diretamente o resultado traduzido."
-        }
-      }
+        },
+        "notSupported": "Operação não suportada"
+      },
+      "deleteConfirm": "Confirma a exclusão deste arquivo?"
     },
     "editor": {
       "copySuccess": "Cópia Bem-sucedida",
@@ -1394,6 +1495,15 @@
         "error": "Falha no upload",
         "needToken": "O upload de imagens precisa configurar o accessToken",
         "uploading": "Enviando imagem"
+      },
+      "saveDialog": {
+        "title": "Salvar Arquivo",
+        "emptyContent": "Conteúdo vazio",
+        "emptyContentDesc": "Por favor, insira o conteúdo antes de salvar",
+        "success": "Salvo com sucesso",
+        "successDesc": "Arquivo salvo",
+        "error": "Falha ao salvar",
+        "errorDesc": "Falha ao salvar arquivo, tente novamente"
       }
     },
     "footer": {
@@ -1423,6 +1533,50 @@
         "pending": "Pendente {progress}%",
         "synced": "Sincronizado"
       }
+    },
+    "clipboard": {
+      "copied": "Copiado para a área de transferência",
+      "cut": "Recortado para a área de transferência",
+      "pasted": "Colado com sucesso",
+      "pasteFailed": "Falha na operação de colar",
+      "empty": "A área de transferência está vazia",
+      "confirmOverwrite": "O arquivo já existe, deseja sobrescrevê-lo?"
+    },
+    "toolbar": {
+      "sortByName": "Ordenar por Nome",
+      "sortByCreated": "Ordenar por Data de Criação",
+      "sortByModified": "Ordenar por Data de Modificação",
+      "sortAsc": "Ordem Crescente",
+      "sortDesc": "Ordem Decrescente",
+      "sort": "Ordenar",
+      "processingVectors": "Processando Dados Vetoriais",
+      "calculateVectors": "Calcular Vetores do Documento",
+      "enableVectorDb": "Habilitar Banco de Dados Vetorial"
+    },
+    "sidebar": {
+      "viewDirectory": "Ver Diretório",
+      "cut": "Recortar",
+      "copy": "Copiar",
+      "paste": "Colar",
+      "rename": "Renomear",
+      "deleteSyncFile": "Excluir Arquivo Sincronizado",
+      "deleteLocalFile": "Excluir Arquivo Local",
+      "delete": "Excluir",
+      "confirmDelete": "Tem certeza de que deseja excluir a pasta \"{name}\"? Isso excluirá a pasta e todo o seu conteúdo.",
+      "deleteSuccess": "Excluído com sucesso",
+      "deleteFailed": "Falha ao excluir",
+      "newFile": "Novo Arquivo",
+      "newFolder": "Nova Pasta",
+      "syncFolder": "Sincronizar Pasta",
+      "syncFolderDesc": "Sincronizar todos os arquivos Markdown na pasta atual",
+      "syncFolderSuccess": "Pasta sincronizada com sucesso",
+      "syncFolderError": "Erro ao sincronizar pasta",
+      "syncFolderProgress": "Sincronizando pasta...",
+      "deleteSyncFileSuccess": "Arquivo sincronizado excluído com sucesso",
+      "deleteSyncFileError": "Erro ao excluir arquivo sincronizado"
+    },
+    "error": {
+      "fileExists": "Nome de arquivo já existe"
     }
   },
   "mcp": {
@@ -1517,6 +1671,18 @@
       "error": "Falha no upload",
       "needToken": "O upload de imagens precisa configurar o accessToken",
       "uploading": "Enviando imagem"
+    },
+    "mark": {
+      "title": "Registros",
+      "tooltip": "Usar Registros",
+      "description": "Converta registros em conteúdo para inserir no artigo.",
+      "noRecords": "Nenhum registro",
+      "ocrNoContent": "OCR não reconheceu nenhum conteúdo"
+    },
+    "question": {
+      "tooltip": "Perguntas e Respostas",
+      "selectContent": "Selecione o conteúdo primeiro",
+      "promptTemplate": "Texto de referência: \\n{content}\\nCom base na pergunta: \\n{question}\\n, forneça diretamente o conteúdo da resposta."
     }
   },
   "footer": {
