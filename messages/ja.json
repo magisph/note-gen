@@ -3,29 +3,23 @@
     "title": "ノート生成ツール",
     "description": "あなたのAI搭載ノートアシスタント"
   },
-  "common": {
-    "save": "保存",
-    "cancel": "キャンセル",
-    "delete": "削除",
-    "confirm": "確認",
-    "edit": "編集",
-    "create": "作成",
-    "theme": "テーマ",
-    "light": "ライトモード",
-    "dark": "ダークモード",
-    "system": "システム設定に従う",
-    "pin": "ピン留め",
-    "unpin": "ピン留めを解除",
+  "tray": {
+    "quickRecord": "クイック記録",
+    "moreRecord": "その他の記録",
+    "open": "開く",
+    "showMain": "メインウィンドウを表示",
+    "newNote": "新規ノート",
+    "newFolder": "新規フォルダー",
     "settings": "設定",
-    "back": "戻る",
-    "sync": "同期",
-    "language": "言語",
-    "success": "成功",
-    "error": "失敗",
-    "defaultFileName": "無題のドキュメント",
-    "restartToApply": "、設定を有効にするにはアプリケーションを再起動してください"
+    "window": "ウィンドウ",
+    "pinToggle": "ピン留め/解除",
+    "hideWindow": "トレイに隠す",
+    "quit": "NoteGenを終了"
   },
   "settings": {
+    "defaultModels": {
+      "title": "デフォルトモデル"
+    },
     "others": "その他",
     "general": {
       "title": "一般設定",
@@ -62,6 +56,24 @@
           "title": "記録のテキストサイズ",
           "desc": "記録リストの記録項目のテキストサイズを調整"
         },
+        "fontFamily": {
+          "title": "アプリのフォント",
+          "desc": "デスクトップではインストール済みのシステムフォントを選択できます。モバイルではプラットフォーム対応の汎用フォントを使用します。",
+          "placeholder": "フォントを選択",
+          "loading": "システムフォントを読み込み中...",
+          "noSystemFonts": "このプラットフォームでは完全なシステムフォント一覧を取得できません",
+          "groups": {
+            "default": "デフォルト",
+            "generic": "汎用フォント",
+            "system": "システムフォント"
+          },
+          "options": {
+            "system": "システム既定",
+            "sansSerif": "サンセリフ",
+            "serif": "セリフ",
+            "monospace": "等幅"
+          }
+        },
         "customCss": {
           "title": "カスタム CSS",
           "desc": "カスタム CSS スタイルを追加してアプリケーションのデフォルトスタイルを上書き",
@@ -76,6 +88,96 @@
           "enabled": {
             "title": "トレイを有効にする",
             "desc": "ウィンドウを閉じる時にトレイに最小化するかアプリを終了するか選択"
+          }
+        },
+        "customTheme": {
+          "title": "自定义主题颜色",
+          "desc": "自定义应用的主题颜色，包括背景色、前景色、边框色等",
+          "button": "编辑颜色",
+          "dialogTitle": "自定义主题颜色",
+          "dialogDesc": "配置自定义主题颜色。颜色更改会实时保存并生效，同时覆盖亮色和暗色主题。",
+          "close": "閉じる",
+          "reset": "重置全部",
+          "tabs": {
+            "custom": "自定义",
+            "presets": "预设方案",
+            "importExport": "导入导出"
+          },
+          "export": {
+            "title": "导出配色方案",
+            "button": "生成导出代码",
+            "placeholder": "点击生成按钮将当前配色导出为代码"
+          },
+          "import": {
+            "title": "导入配色方案",
+            "button": "导入配色",
+            "placeholder": "粘贴配色方案的 JSON 代码"
+          },
+          "colors": {
+            "background": "背景色",
+            "foreground": "前景色",
+            "card": "卡片背景色",
+            "cardForeground": "卡片前景色",
+            "primary": "主色调",
+            "primaryForeground": "主色调前景色",
+            "secondary": "次要色调",
+            "secondaryForeground": "次要色调前景色",
+            "third": "第三色调",
+            "thirdForeground": "第三色调前景色",
+            "muted": "柔和色",
+            "mutedForeground": "柔和色前景色",
+            "accent": "强调色",
+            "accentForeground": "强调色前景色",
+            "border": "边框色",
+            "shadow": "阴影色"
+          },
+          "presets": {
+            "apply": "应用",
+            "reset": {
+              "name": "恢复默认"
+            },
+            "default": {
+              "name": "默认白色"
+            },
+            "ocean": {
+              "name": "海洋蓝"
+            },
+            "forest": {
+              "name": "森林绿"
+            },
+            "sunset": {
+              "name": "日落红"
+            },
+            "lavender": {
+              "name": "薰衣草紫"
+            },
+            "midnight": {
+              "name": "午夜暗"
+            },
+            "deepSea": {
+              "name": "深海蓝"
+            },
+            "darkForest": {
+              "name": "暗夜绿"
+            },
+            "darkViolet": {
+              "name": "紫罗兰暗"
+            },
+            "coralWarm": {
+              "name": "珊瑚暖"
+            },
+            "slateGray": {
+              "name": "石板灰"
+            },
+            "darkGold": {
+              "name": "暗夜金"
+            },
+            "beigeWarm": {
+              "name": "米黄暖"
+            },
+            "beigeDark": {
+              "name": "米黄暗"
+            }
           }
         }
       },
@@ -101,7 +203,8 @@
           "button": "設定",
           "dialogTitle": "記録ツールバーを構成",
           "dialogDesc": "ツールをドラッグして順序を調整し、スイッチを使用して表示または非表示を制御"
-        }
+        },
+        "desc": "配置各种工具栏按钮的显示和排序"
       }
     },
     "rag": {
@@ -122,7 +225,8 @@
       "similarityThreshold": "類似度閾値",
       "similarityThresholdDesc": "ドキュメントとクエリの最小類似度閾値。この閾値を超えるドキュメントのみが返されます。値の範囲は 0.0-1.0、高いほど厳格です。",
       "resetToDefaults": "デフォルト値に戻す",
-      "deleteVector": "知識庫を空にする"
+      "deleteVector": "知識庫を空にする",
+      "topPDesc": "Top P パラメータはモデルが生成するテキストの多様性を制御します。値が小さいほど出力は決定论的になり、値が大きいほど多様になります。"
     },
     "mcp": {
       "title": "MCP",
@@ -191,13 +295,50 @@
       "jsonImportSuccess": "{count} 個のサーバーを正常にインポートしました",
       "jsonImportSkipped": "{count} 個の既存サーバーをスキップしました",
       "jsonImportNoServers": "サーバーがインポートされませんでした",
-      "import": "インポート"
+      "import": "インポート",
+      "mobileHttpOnlyTitle": "ローカルコマンド MCP はデスクトップ専用です",
+      "mobileHttpOnlyDesc": "ローカルコマンド型 MCP サーバーはデスクトップでのみ利用できます。モバイルでは現在 HTTP MCP のみサポートします。",
+      "runtimeEnvironment": "ランタイム環境",
+      "runtimeEnvironmentDesc": "MCP サーバーをテストする前に、必要なローカルランタイムが利用可能か確認します。",
+      "checkEnvironment": "環境を確認",
+      "recheckEnvironment": "再チェック",
+      "runtimeCheckFailed": "環境チェックに失敗しました",
+      "detectedLauncher": "検出されたランチャー",
+      "runtimeInstalled": "インストール済み",
+      "runtimeMissing": "未検出",
+      "runtimeVersion": "バージョン",
+      "runtimeInstalledSummary": "{installed}/{total} がインストール済み",
+      "showRuntimeDetails": "ランタイムの詳細を表示",
+      "hideRuntimeDetails": "ランタイムの詳細を隠す",
+      "runtimeNotChecked": "このランタイムはまだ確認していません。",
+      "runtimeCurrentUserScope": "対応している場合、推奨コマンドは現在のユーザー環境にインストールします。",
+      "runtimeManualOnly": "このプラットフォームでは自動インストールに対応していません。手動でインストールしてから再チェックしてください。",
+      "installRuntime": "ランタイムをインストール",
+      "runtimeInstallTitle": "ランタイムをインストール",
+      "runtimeInstallDesc": "確認後、NoteGen は以下のインストールコマンドを実行します。",
+      "runtimeInstallPreparing": "インストールを準備中",
+      "runtimeInstallRunning": "インストール中",
+      "runtimeInstallCompleted": "インストール完了",
+      "runtimeInstallCancelled": "キャンセル済み",
+      "runtimeInstallFailedState": "インストール失敗",
+      "runtimeInstallLogs": "インストールログ",
+      "runtimeInstallWaitingLogs": "インストール出力を待機中...",
+      "runtimeInstallClose": "閉じる",
+      "runtimeInstallCancel": "インストールを停止",
+      "runtimeInstallCancelledByUser": "ユーザーがインストールのキャンセルを要求しました。",
+      "runtimeInstallCancelFailed": "インストールの停止に失敗しました",
+      "runtimeInstallSuccess": "ランタイムのインストールが完了しました",
+      "runtimeInstallFailed": "ランタイムのインストールに失敗しました",
+      "runtimeNoGuidedSupport": "このコマンドにはまだガイド付きランタイム補助がありません。",
+      "enableTitle": "启用 MCP 功能",
+      "enableDesc": "启用后，AI 可以调用配置的 MCP 服务器提供的工具。"
     },
     "editor": {
-      "title": "Markdown エディタ",
-      "desc": "ここでは、Markdown エディタをカスタマイズして、より適した書き込み体験を提供できます。",
-      "typewriterMode": "打字機モード",
-      "typewriterModeDesc": "打字機モード下、エディタは打字機の効果を模倣し、より深く浸かる書き込み体験を提供します。",
+      "title": "エディター設定",
+      "interfaceSettings": "インターフェース設定",
+      "desc": "ここでは、エディターをカスタマイズして、より適した書き込み体験を提供できます。",
+      "centeredContent": "コンテンツを中央に表示",
+      "centeredContentDesc": "有効にすると、コンテンツを中央に表示し、両側に余白を設けます。",
       "outlineEnable": "アウトラインを有効にする",
       "outlineEnableDesc": "アウトラインを有効にすると、アウトラインが表示されます。",
       "outlinePosition": "アウトライン位置",
@@ -206,14 +347,92 @@
         "left": "左側",
         "right": "右側"
       },
-      "pageView": "ページビュー",
-      "pageViewDesc": "沉浸視图下、編集器の両側に大量の空白が残され、全景モード下、編集器の内容は編集領域を占めます。",
-      "pageViewOptions": {
-        "immersiveView": "沉浸視图",
-        "panoramaView": "全景視图"
+      "showUndoRedo": "元に戻す/やり直しボタン",
+      "showUndoRedoDesc": "エディターのタブバーに元に戻すボタンとやり直しボタンを表示します。",
+      "completion": {
+        "title": "自動補完",
+        "model": {
+          "title": "自動補完モデル",
+          "desc": "エディターの AI インライン補完に使用するモデルを選択"
+        }
       },
-      "enableLineNumber": "コードブロック行番号",
-      "enableLineNumberDesc": "コードブロックに行番号を表示します。"
+      "commit": {
+        "title": "自動コミットメッセージ",
+        "model": {
+          "title": "コミットモデル",
+          "desc": "ファイルの変更に基づいて Git コミットメッセージを自動生成するためのモデル"
+        }
+      },
+      "mermaid": {
+        "title": " диаграмма",
+        "rendering": "レンダリング中...",
+        "renderError": "レンダリングエラー",
+        "clickToEdit": "クリックしてソースを編集",
+        "clickToAdd": "クリックして диаграммаを追加",
+        "placeholder": "Mermaid диаграммаコードを入力...",
+        "preview": "プレビュー",
+        "done": "完了",
+        "diagramTypes": {
+          "flowchart": "フローチャート",
+          "sequence": "シーケンス",
+          "classDiagram": "クラス図",
+          "stateDiagram": "ステート図",
+          "er": "ER図",
+          "gantt": "ガントチャート",
+          "pie": "円グラフ",
+          "journey": "ジャーニー"
+        },
+        "templates": {
+          "flowchart": "graph TD\n    A[開始] --> B[処理]\n    B --> C[終了]",
+          "sequence": "sequenceDiagram\n    participant Alice\n    participant Bob\n    Alice->>Bob: こんにちは\n    Bob-->>Alice: 返信",
+          "classDiagram": "classDiagram\n    Animal <|-- Duck\n    Animal <|-- Fish\n    Animal : +int age\n    Animal : +String gender",
+          "stateDiagram": "stateDiagram-v2\n    [*] --> Active\n    Active --> [*]",
+          "er": "erDiagram\n    CUSTOMER ||--o{ ORDER : places\n    CUSTOMER ||--o{ DELIVERY-ADDRESS : uses",
+          "gantt": "gantt\n    title プロジェクト計画\n    dateFormat YYYY-MM-DD\n    section 第一フェーズ\n    タスク1 :a1, 2024-01-01, 30d\n    section 第二フェーズ\n    タスク2 :after a1, 20d",
+          "pie": "pie title リソース割り当て\n    \"CPU\" : 45\n    \"メモリ\" : 30\n    \"ストレージ\" : 25",
+          "journey": "journey\n    title 私の日常工作\n    section 午前\n    通勤 : 7:00, 5\n    仕事 : 9:00, 8"
+        }
+      }
+    },
+    "record": {
+      "title": "記録設定",
+      "desc": "ここでは、記録関連の設定を構成できます。記録の説明やツールバーの設定などが含まれます。",
+      "model": {
+        "title": "モデル設定",
+        "markDesc": {
+          "title": "記録説明",
+          "desc": "OCR で認識された記録を処理し、記録の説明を生成するためのモデル"
+        }
+      },
+      "toolbar": {
+        "title": "ツールバー設定",
+        "recordToolbar": {
+          "title": "記録ツールバー",
+          "desc": "記録ツールバーボタンの表示順序と可視性をカスタマイズ",
+          "button": "設定",
+          "text": {
+            "desc": "记录文本内容"
+          },
+          "recording": {
+            "desc": "录音记录功能"
+          },
+          "scan": {
+            "desc": "扫描识别图片中的文字"
+          },
+          "image": {
+            "desc": "上传图片到笔记"
+          },
+          "link": {
+            "desc": "记录网页链接"
+          },
+          "file": {
+            "desc": "上传文件到笔记"
+          },
+          "todo": {
+            "desc": "创建待办事项"
+          }
+        }
+      }
     },
     "uploadStore": {
       "uploadConfirm": "同期リポジトリをプライベートに設定してください。",
@@ -239,7 +458,67 @@
       "optimizing": "最適化中...",
       "optimizeSuccess": "プロンプトの最適化が成功しました",
       "optimizeFailed": "プロンプトの最適化に失敗しました。後でもう一度お試しください",
-      "noContentToOptimize": "まずプロンプト内容を入力してください"
+      "noContentToOptimize": "まずプロンプト内容を入力してください",
+      "systemPrompt": {
+        "title": "システムプロンプト",
+        "desc": "高度な設定：Agent システムプロンプトの静的ルール部分を編集します。頻繁な変更は推奨されません。",
+        "label": "システムプロンプト内容",
+        "placeholder": "Agent の身分定義、ツール呼び出し制約、Core Rules を入力してください。",
+        "help": "この高度な設定は Agent の動作境界に影響します。ツール一覧、現在のファイル、選択範囲、Skills、MCP コンテキストは引き続きシステムが動的に追加します。",
+        "reset": "デフォルトに戻す",
+        "saveSuccess": "システムプロンプトを保存しました",
+        "resetSuccess": "システムプロンプトをデフォルトに戻しました"
+      }
+    },
+    "memories": {
+      "title": "記憶管理",
+      "desc": "AI長期記憶機能で、AIがあなたの執筆設定、知識ベース、メモ習慣を記憶します。",
+      "stats": {
+        "total": "総記憶数",
+        "preferences": "設定",
+        "memories": "记忆"
+      },
+      "form": {
+        "title": "新しい記憶を追加",
+        "contentLabel": "記憶の内容",
+        "contentPlaceholder": "例：中国語で回答してほしい、Reactエキスパートです...",
+        "categoryLabel": "タイプ",
+        "preferenceDesc": "設定（言語、形式、スタイルなど）",
+        "save": "記憶を保存",
+        "saving": "保存中...",
+        "categoryDescription": "记忆分为两种类型：",
+        "preferenceDescription": "偏好：语言、格式、风格等设置，每次对话都会自动加载",
+        "memoryDescription": "记忆：事实、经验、专长等信息，根据对话内容智能匹配",
+        "preferenceLabel": "偏好",
+        "memoryLabel": "记忆",
+        "memoryDesc": "事实、经验、专长等"
+      },
+      "listTitle": "マイ記憶",
+      "addMemory": "記憶を追加",
+      "empty": "まだ記憶がありません。最初の記憶を追加しましょう！",
+      "emptyHint": "手動で記憶を追加するか、会話で「覚えて」「これを覚えて」などのフレーズを使うとAIが自動的に記憶を作成します。",
+      "preference": "設定",
+      "replaced": "置換済み",
+      "accessCount": "{count} 回アクセス",
+      "tabs": {
+        "all": "すべて",
+        "preference": "設定",
+        "memory": "记忆"
+      },
+      "success": "成功",
+      "saved": "記憶を保存しました",
+      "updated": "記憶を更新しました（類似の記憶を置換）",
+      "deleted": "記憶を削除しました",
+      "cleared": "すべての記憶をクリアしました",
+      "found": "{count} 件の記憶が見つかりました",
+      "error": "エラー",
+      "errorEmpty": "記憶の内容を入力してください",
+      "errorSave": "保存に失敗しました",
+      "errorDelete": "削除に失敗しました",
+      "errorList": "記憶リストの取得に失敗しました",
+      "errorEmbedding": "埋め込みの生成に失敗しました。埋め込みモデルの設定を確認してください",
+      "errorClear": "クリアに失敗しました",
+      "memory": "记忆"
     },
     "defaultModel": {
       "title": "デフォルトモデル",
@@ -247,8 +526,7 @@
       "tooltip": "メインモデルを使用",
       "noModel": "使用しない",
       "placeholder": "モデルを選択または検索してください",
-      "main": "メインモデル",
-      "options" : {
+      "options": {
         "primaryModel": {
           "title": "メインモデル",
           "desc": "すべてのシーンのメインモデルとして、他の会話モデルがデフォルトモデルを選択していない場合、このモデルを使用します。"
@@ -276,79 +554,157 @@
         "reranking": {
           "title": "再ランキングモデル",
           "desc": "検索結果の並べ替えと最適化に使用されます。"
+        },
+        "condense": {
+          "title": "摘要模型",
+          "desc": "用于压缩历史对话内容，节省 token 使用量"
         }
-      }
+      },
+      "mainModel": "メインモデル"
     },
     "readAloud": {
-      "title": "音声読み上げ",
-      "desc": "ここでは、音声読み上げ関連の設定を構成し、チャットコンテンツに音声再生機能を提供できます。",
-      "noModel": "モデルを使用しない",
+      "title": "読み上げ",
+      "desc": "読み上げ方法を設定します。既定ではシステム音声を優先し、モデル音声は強化用として利用します。",
       "options": {
+        "mode": {
+          "title": "モード",
+          "desc": "自動モードではシステム音声を優先し、ローカル音声が使えない場合のみモデルを試します。",
+          "auto": "自動（推奨）",
+          "local": "ローカルのみ",
+          "model": "モデルのみ"
+        },
         "audioModel": {
-          "title": "音声モデル",
-          "desc": "テキストから音声への変換にAIモデルを選択し、様々な音声タイプとパラメータ設定をサポートします。"
+          "title": "読み上げモデル",
+          "desc": "任意です。自動モードの強化やモデル専用モードで利用できます。"
         },
         "speed": {
-          "title": "読み上げ速度",
-          "desc": "音声の再生速度を調整します。0.25倍から4倍の範囲で設定でき、1倍が通常の速度です。"
+          "title": "速度",
+          "desc": "読み上げ速度を0.5倍から2倍まで調整できます。既定値は1倍です。"
         }
       }
     },
     "about": {
       "title": "このアプリについて",
-      "desc": "記録と執筆に特化したメモ取りアシスタント。",
+      "desc": "まず記録し、あとで整理。",
+      "resourcesTitle": "リソースとサポート",
+      "resourcesDesc": "ドキュメント、リリースノート、コミュニティでのフィードバックを確認できます。",
+      "licenseText": "オープンソース · GitHub · GPL-3.0",
       "version": "NoteGen v{version}",
       "checkReleases": "過去のバージョンを確認",
       "language": "言語",
       "checkUpdate": "アップデートを確認",
       "checkError": "アップデートの確認に失敗しました",
+      "releaseLoadError": "更新履歴の読み込みに失敗しました",
       "updateAvailable": "新しいバージョンが利用可能です",
+      "updateIgnored": "このバージョンは無視されています",
       "updateDownloading": "更新中 {downloaded} / {contentLength}",
       "updateInstalled": "アプリを再起動",
       "noUpdate": "現在は最新バージョンです",
+      "lastCheckedAt": "前回の確認：{time}",
+      "lastCheckedNever": "まだアップデートを確認していません",
+      "releasePublishedAt": "{date} に公開",
+      "releaseHistoryTitle": "更新履歴",
+      "releaseHistoryDesc": "v{currentVersion} から v{latestVersion} まで、合計 {count} バージョン。",
+      "releaseHistoryEmpty": "現在のバージョンから最新バージョンまでの更新履歴が見つかりませんでした。",
+      "releasePrerelease": "プレリリース",
+      "releaseNoNotes": "このバージョンのリリースノートはありません。",
+      "retryReleaseNotes": "再読み込み",
       "ignoreVersion": "このバージョンを無視",
       "ignoreVersionSuccess": "このバージョンの更新を無視しました",
+      "ignoredVersionTitle": "v{version} を無視しました",
+      "ignoredVersionDesc": "このバージョンの更新通知は再表示されません。通知を復元してインストールを続行できます。",
+      "restoreIgnoredVersion": "通知を復元",
+      "restoreIgnoredVersionSuccess": "このバージョンの更新通知を復元しました",
+      "sections": {
+        "appInfo": {
+          "title": "アプリ情報",
+          "desc": "現在のバージョン、更新状態、アプリ概要を確認します。"
+        },
+        "updates": {
+          "title": "バージョン更新",
+          "desc": "最新リリースノートと更新履歴を確認します。"
+        },
+        "donation": {
+          "title": "寄付",
+          "desc": "NoteGen が役立っている場合は、寄付で継続的なメンテナンスを支援できます。"
+        },
+        "docs": {
+          "title": "ドキュメントと設定",
+          "desc": "同期、バックアップ、データ保存について確認します。"
+        },
+        "community": {
+          "title": "フィードバックとコミュニティ",
+          "desc": "問題を報告し、ソースコードや公開ディスカッションを確認します。"
+        }
+      },
       "items": {
         "home": {
           "title": "公式サイト",
           "buttonName": "表示",
-          "desc": "公式サイトを表示して、NoteGenの詳細を確認できます。"
+          "desc": "公式サイトを開きます。"
         },
         "guide": {
-          "title": "ガイド",
+          "title": "同期設定ガイド",
           "buttonName": "表示",
-          "desc": "配置ガイドを表示して、モデル、同期などの情報の設定方法を学ぶことができます。"
+          "desc": "Git、S3、WebDAV同期を設定します。"
+        },
+        "donate": {
+          "title": "NoteGen を支援",
+          "buttonName": "寄付",
+          "desc": "寄付ページを開いてプロジェクトを支援します。"
+        },
+        "business": {
+          "title": "ビジネス提携",
+          "buttonName": "連絡",
+          "desc": "提携、プロモーション、ブランド関連の機会について確認します。"
         },
         "github": {
           "title": "GitHub",
           "buttonName": "表示",
-          "desc": "NoteGenが役立った場合は、鼓励するには、GitHubにスターを付けてください！"
+          "desc": "ソースコードと貢献を確認します。"
         },
         "releases": {
-          "title": "更新日志",
+          "title": "更新履歴",
           "buttonName": "表示",
-          "desc": "更新日志を表示して、NoteGenの更新内容を確認できます。"
+          "desc": "更新履歴を確認します。"
         },
         "issues": {
           "title": "問題報告",
           "buttonName": "報告",
-          "desc": "NoteGenにバグを見つけた場合は、ここに報告してください。"
+          "desc": "問題やバグを報告します。"
         },
         "discussions": {
           "title": "ディスカッション",
           "buttonName": "参加",
-          "desc": "作者や他のユーザーとディスカッションを参加できます。"
+          "desc": "コミュニティで交流します。"
         }
       }
     },
     "sync": {
       "title": "同期",
       "desc": "ここでは、同期リポジトリを設定することができます。ログ、markdownファイル、システム設定などの情報を同期するのに役立ちます。",
+      "selectPlatform": "同期プラットフォームを選択",
+      "platformSettings": "プラットフォームを選択",
+      "settings": "同期設定",
+      "platformDesc": "Tokenとリポジトリ情報を設定して同期を有効にします",
+      "moreSettings": "その他の設定",
+      "noteSettings": "ノート設定",
+      "recordConfigSettings": "記録と設定",
       "repoStatus": "リポジトリの状態",
       "syncRepo": "同期リポジトリ",
       "syncRepoDesc": "執筆中のMarkdownファイルを同期",
       "imageRepo": "画像ホスティング倉庫",
       "imageRepoDesc": "あなたの画像を画像ホスティングリポジトリに同期します。",
+      "status": {
+        "connected": "接続済み",
+        "disconnected": "未接続",
+        "failed": "接続失敗",
+        "unconfigured": "未設定"
+      },
+      "uploadRecords": "レコードと設定をアップロード",
+      "downloadConfig": "レコードと設定をダウンロード",
+      "cloudSync": "レコードと設定の同期",
+      "localBackupAll": "ローカルバックアップ（全て）",
       "private": "非公開",
       "public": "公開",
       "createdAt": "{time} に作成",
@@ -356,12 +712,12 @@
       "newToken": "作成 access token",
       "newTokenDesc": "新しいトークンを作成する際は必ずrepo権限を選択してください。設定後、自動的にプライベートリポジトリと画像ホスティングリポジトリが作成されます。",
       "giteeTokenDesc": "Giteeの個人アクセストークンはデータ同期に使用されます。リポジトリの読み書き権限が必要です。設定後、自動的にファイルリポジトリ（プライベート）と画像リポジトリが作成されます。",
-      "imageRepoSetting": "ローカル/クラウドストレージ",
+      "imageRepoSetting": "画像ホスティングを有効化",
       "imageRepoSettingDesc": "画像ホスティングリポジトリが設定されています。有効にすると画像はそちらに保存され、無効の場合はローカル保存となります。",
       "jsdelivrSetting": "jsDelivr",
       "jsdelivrSettingDesc": "jsdelivrを利用して画像アクセスを高速化します。",
-      "autoSync": "自動同期",
-      "autoSyncDesc": "有効にすると、エディターは入力停止から10秒後にGitHubに自動同期します",
+      "autoSync": "ノートを自動同期",
+      "autoSyncDesc": "ノート編集が止まった後、選択した遅延で現在の同期プロバイダーへ自動同期します",
       "giteeAutoSyncDesc": "有効にすると、エディターは入力停止から10秒後にGiteeに自動同期します",
       "customSyncRepo": "カスタム同期リポジトリ名",
       "customSyncRepoDesc": "空白の場合はデフォルトのリポジトリ名を使用",
@@ -369,12 +725,12 @@
       "customImageRepoDesc": "空白の場合はデフォルトのリポジトリ名を使用",
       "backupMethod": "バックアップ方法",
       "backupMethodDesc": "主要バックアップ方法として設定すると、文章作成中のすべての同期関連機能が現在のバックアップ方法を使用します（画像ホスティング機能を除く）",
-      "isPrimaryBackup": "現在の {type} 主要バックアップ方法",
-      "setPrimaryBackup": "主要バックアップ方法として設定",
       "createRepo": "リポジトリを作成",
       "creating": "作成中",
       "checkRepo": "リポジトリを確認",
       "checking": "確認中",
+      "enterToken": "Access Tokenを入力してください",
+      "enterTokenHint": "リポジトリ的状态を確認するには、先にAccess Tokenを入力してください",
       "gitlabInstanceType": "GitLab インスタンスタイプ",
       "gitlabInstanceTypeDesc": "接続する GitLab インスタンスタイプを選択してください",
       "gitlabInstanceTypePlaceholder": "GitLab インスタンスタイプを選択してください",
@@ -383,16 +739,61 @@
         "selfHostedDesc": "自建 GitLab インスタンスの URL を入力してください（例：https://gitlab.example.com）"
       },
       "gitlabAccessTokenDesc": "{instanceDisplayName}でパーソナルアクセストークンを作成するには、api権限が必要です",
-      "autoSync": "自動同期",
+      "autoDataSync": "記録と設定を自動同期",
+      "autoDataSyncDesc": "記録または設定の変更後、現在の同期プロバイダーへ順番に自動アップロードします。プロバイダー未設定時はアップロードしません",
+      "autoDataSyncStatusOff": "自動同期はオフです",
+      "autoDataSyncStatusWaitingProvider": "同期プロバイダーの設定待ち",
+      "autoDataSyncStatusQueued": "同期キューに追加済み",
+      "autoDataSyncStatusManualSyncing": "手動同期中",
+      "autoDataSyncStatusSyncing": "自動同期中",
+      "autoDataSyncStatusFailed": "同期に失敗しました",
+      "autoDataSyncStatusConflict": "同期の競合",
+      "autoDataSyncStatusIdle": "同期済み",
+      "autoDataSyncStatusTitle": "記録と設定の同期",
+      "autoDataSyncStatusProvider": "プロバイダー",
+      "autoDataSyncStatusPending": "保留中",
+      "autoDataSyncStatusLastSuccess": "前回成功",
+      "autoDataSyncStatusError": "エラー",
+      "autoDataSyncRetry": "再試行",
+      "autoDataSyncOpenSettings": "設定を開く",
+      "autoDataSyncNever": "未実行",
+      "autoDataSyncConflictTitle": "同期の競合を解決",
+      "autoDataSyncConflictDesc": "リモート内容が別のデバイスで更新され、このデバイスにも未アップロードの変更があります。どちらのデータを残すか選択してください。",
+      "autoDataSyncConflictMerge": "両方をマージ",
+      "autoDataSyncConflictMergeDesc": "マージでは、ローカルとリモートの新規記録を残します。同じ記録は新しいタイムスタンプを優先し、設定は現在のプライバシールールでマージされます。",
+      "autoDataSyncConflictPullRemote": "リモートでローカルを上書き",
+      "autoDataSyncConflictUploadLocal": "ローカルでリモートを上書き",
+      "autoDataSyncConflictLater": "後で対応",
+      "autoDataSyncConflictPullConfirm": "リモートを取得すると、未同期のローカル記録と設定が上書きされます。続行しますか？",
+      "autoDataSyncConflictUploadConfirm": "ローカルをアップロードすると、最新のリモート記録と設定が上書きされます。他のデバイスの変更が失われる可能性があります。続行しますか？",
+      "autoDataSyncConflictResolved": "同期の競合を解決しました",
+      "autoDataSyncConflictResolveFailed": "同期の競合解決に失敗しました",
+      "autoDataSyncInitialSuccess": "自動同期の初期化が完了しました",
+      "autoDataSyncInitialFailed": "自動同期の初期化に失敗しました",
+      "autoDataSyncInitialTitle": "初回の自動同期方向を選択",
+      "autoDataSyncInitialDesc": "デバイスを切り替える時や初回有効化時は、誤った上書きを避けるため、ローカルデータをアップロードするか、リモートの最新記録と設定を取得するかを先に選択してください。",
+      "autoDataSyncInitialUploadLocal": "ローカルデータをアップロード",
+      "autoDataSyncInitialPullRemote": "リモートの最新を取得",
+      "autoDataSyncInitialLater": "後で対応",
+      "autoDataSyncPrivacyTitle": "機密設定を同期しない",
+      "autoDataSyncPrivacyDesc": "有効にすると、Access Token、パスワード、シークレット、同期プロバイダーの選択、画像ホスティング設定、MCP 設定、ワークスペースパスなど、デバイス固有またはプライベートな設定は除外されます。",
+      "autoDataSyncPrivacyDisableConfirm": "オフにすると、Access Token、パスワード、シークレットなどの機密またはデバイス固有の設定がリモート同期プロバイダーへアップロードされ、他のデバイスへ同期される可能性があります。オフにしますか？",
       "autoSyncOptions": {
         "placeholder": "自動同期時間",
         "disabled": "無効",
+        "2s": "2 秒",
+        "3s": "3 秒",
+        "5s": "5 秒",
         "10s": "10 秒",
+        "20s": "20 秒",
         "30s": "30 秒",
         "1m": "1 分",
-        "5m": "5 分",
-        "30m": "30 分"
+        "2m": "2 分"
       },
+      "autoPullOnOpen": "ファイルを開く時に自動プル",
+      "autoPullOnOpenDesc": "ファイルを開く時、リモートに新しいバージョンがある場合は自動的にプルしてローカルを上書き",
+      "autoPullOnSwitch": "ファイルを切り替える時に自動プル",
+      "autoPullOnSwitchDesc": "他のファイルに切り替える時、リモートに新しいバージョンがある場合は自動的にプルしてローカルを上書き",
       "exclusions": {
         "title": "同期除外設定",
         "desc": "以下の設定はデバイス固有のものであるため、デバイス間で同期されません",
@@ -410,19 +811,84 @@
         "downloadSuccess": "設定のダウンロードに成功しました",
         "downloadFailed": "設定のダウンロードに失敗しました",
         "autoSync": "アップロード/ダウンロード時に設定が自動的に同期されます（ワークスペースパスなどのデバイス固有の設定を除く）"
+      },
+      "defaultRepoName": "默认: {name}",
+      "giteaInstanceType": "Gitea 实例类型",
+      "giteaInstanceTypeDesc": "选择要连接的 Gitea 实例类型",
+      "giteaInstanceTypePlaceholder": "选择 Gitea 实例类型",
+      "giteaInstanceTypeOptions": {
+        "selfHosted": "自建实例",
+        "selfHostedDesc": "输入您的自建 Gitea 服务器地址（如：https://gitea.example.com）"
+      },
+      "giteaAccessTokenDesc": "在 {instanceDisplayName} 创建个人访问令牌，需要完整的 repository 权限",
+      "s3": {
+        "title": "S3 同期",
+        "description": "S3互換ストレージを使用してノートを同期します",
+        "status": "接続状態",
+        "connected": "接続済み",
+        "connecting": "接続中",
+        "disconnected": "未接続",
+        "accessKeyId": "Access Key ID",
+        "accessKeyIdPlaceholder": "Access Key IDを入力してください",
+        "secretAccessKey": "Secret Access Key",
+        "secretAccessKeyPlaceholder": "Secret Access Keyを入力してください",
+        "region": "リージョン",
+        "bucket": "バケット",
+        "bucketPlaceholder": "バケット名を入力してください",
+        "endpoint": "エンドポイント",
+        "pathPrefix": "パスプレフィックス",
+        "pathPrefixPlaceholder": "パスプレフィックスを入力してください",
+        "pathPrefixDesc": "異なるユーザーのファイルを区別するために使用、リポジトリ名に類似",
+        "customDomain": "カスタムドメイン",
+        "testConnection": "接続テスト",
+        "testing": "テスト中",
+        "saveConfig": "設定を保存",
+        "saving": "保存中"
+      },
+      "webdav": {
+        "title": "WebDAV 同期",
+        "description": "WebDAVプロトコルを使用してノートを同期します",
+        "status": "接続状態",
+        "connected": "接続済み",
+        "connecting": "接続中",
+        "disconnected": "未接続",
+        "url": "サーバーURL",
+        "urlPlaceholder": "WebDAV サーバーURLを入力してください",
+        "urlDesc": "Synology、QNAP、Nextcloud などのWebDAVサービスをサポート",
+        "username": "ユーザー名",
+        "usernamePlaceholder": "ユーザー名を入力してください",
+        "password": "パスワード",
+        "passwordPlaceholder": "パスワードを入力してください",
+        "pathPrefix": "パスプレフィックス",
+        "pathPrefixPlaceholder": "パスプレフィックスを入力してください",
+        "pathPrefixDesc": "異なるユーザーのファイルを区別するために使用",
+        "testConnection": "接続テスト",
+        "testing": "テスト中",
+        "saveConfig": "設定を保存",
+        "saving": "保存中"
       }
     },
     "imageHosting": {
       "title": "画像ホスティング",
       "desc": "ここでは、画像の保存と管理のための画像ホスティングサービスを設定できます。",
+      "type": "プラットフォームを選択",
+      "typeDesc": "画像ホスティングサービスを選択",
       "customRepoName": "カスタムリポジトリ名",
       "customRepoNameDesc": "空白の場合はデフォルトのリポジトリ名を使用",
       "isPrimaryBackup": "現在の {type} 主要バックアップ方法",
       "setPrimaryBackup": "主要バックアップ方法として設定",
       "smms": {
+        "title": "S.EE 画像ホスティング",
+        "description": "S.EE を使って画像をアップロードおよび管理します",
+        "status": "接続状態",
+        "connected": "接続済み",
+        "connecting": "確認中",
+        "disconnected": "未接続",
         "token": {
-          "desc": "SM.MS Token を入力してください。",
-          "createToken": "Token を作成"
+          "desc": "S.EE Token を入力してください。",
+          "createToken": "S.EE 開発者ページを開く",
+          "helper": "S.EE API Token を入力してください。既存の設定はそのまま再利用できます。",
+          "placeholder": "S.EE API Token を入力"
         },
         "disk": "磁盘使用",
         "error": "取得失敗、ネットワークや Token の正しさを確認してください。"
@@ -452,9 +918,7 @@
         },
         "createNewRepo": "新しいリポジトリを作成",
         "recheckRepo": "再確認",
-        "recheckingRepo": "確認中...",
-        "createRepo": "リポジトリを作成",
-        "creatingRepo": "作成中..."
+        "recheckingRepo": "確認中..."
       },
       "s3": {
         "title": "S3オブジェクトストレージ",
@@ -496,71 +960,37 @@
     },
     "imageMethod": {
       "title": "画像認識",
-      "desc": "ここでは、画像認識に関する設定を配置できます。OCR と VLM の二つの方法をサポートします。",
+      "desc": "画像はデフォルトでシステム OCR により認識されます。VLM が設定されている場合は先に VLM を試し、失敗時に OCR へ戻ります。",
       "enable": {
         "title": "画像認識を有効にする",
         "desc": "有効にすると、スクリーンショット記録と画像記録時に自動的に画像認識が行われます。無効にすると、画像認識がスキップされます。"
       },
-      "setPrimary": "設定をデフォルト",
-      "isPrimary": "{type} がデフォルト設定",
       "ocr": {
-        "title": "OCR",
-        "languagePacks": "言語パック",
-        "checkModels": "ここでは、すべてのモデルを検索できます。",
-        "modelInstruction": "逗号分隔、例如：eng,chi_sim"
+        "title": "システム OCR",
+        "desc": "現在のシステムが提供する OCR 機能をデフォルトで使用します。",
+        "noProviders": "このプラットフォームには内蔵 OCR エンジンがありません",
+        "unknownVersion": "不明なバージョン",
+        "ready": "利用可能",
+        "unavailable": "利用不可",
+        "provider": "現在のエンジン"
       },
       "vlm": {
-        "title": "視覚的言語モデル",
-        "desc": "視覚的言語モデルを使用して画像内容を認識します。"
+        "title": "VLM 拡張（任意）",
+        "desc": "視覚言語モデルを選択すると、画像は先に VLM で認識されます。モデルが利用できない、失敗する、または内容が返らない場合でも、システム OCR に自動的に戻ります。",
+        "noModel": "デフォルトではモデルを使用しない",
+        "clearModel": "VLM モデルをクリア"
       }
     },
     "backupSync": {
       "title": "備用方案",
       "desc": "ここでは、他の方法でデータをバックアップすることができます。定期的にバックアップを取ることで、データの安全を確保できます。",
-      "webdav": {
-        "connectionState": {
-          "success": "接続済み",
-          "checking": "接続中",
-          "failed": "未接続"
-        },
-        "description": "WebDAVはバックアップソリューションとしてのみ使用され、自動同期や履歴ロールバックなどの機能はサポートしていません。",
-        "backupTo": "WebDAVにバックアップ",
-        "syncFrom": "WebDAVから同期",
-        "serverUrl": "WebDAVサーバーURL",
-        "serverUrlDesc": "WebDAVサーバーのURLを入力してくださいパスを含まない、例：https://dav.example.com http://192.8.8.88:9999 ",
-        "serverUrlPlaceholder": "https://dav.example.com",
-        "username": "ユーザー名",
-        "usernameDesc": "WebDAVサーバーのユーザー名",
-        "usernamePlaceholder": "ユーザー名",
-        "password": "パスワード",
-        "passwordDesc": "WebDAVサーバーのパスワード",
-        "passwordPlaceholder": "パスワード",
-        "backupPath": "バックアップパス",
-        "backupPathDesc": "WebDAVサーバー上のバックアップパス、例：/backup/notes",
-        "backupPathPlaceholder": "/backup/notes",
-        "backupSuccess": "バックアップ成功",
-        "backupSuccessDesc": "{count} 個のファイルをWebDAVにバックアップしました。",
-        "syncSuccess": "同期成功",
-        "syncSuccessDesc": "WebDAVからローカルに {count} 個のファイルを同期しました。",
-        "syncFailed": "同期失敗",
-        "backupFailed": "バックアップ失敗",
-        "directoryCreated": "ディレクトリが作成されました",
-        "directoryCreatedDesc": "ディレクトリ {path} が正常に作成されました。",
-        "createDir": "ディレクトリを作成",
-        "success": "成功",
-        "failed": "失敗",
-        "error": {
-          "pathNotFound": "パスが存在しないか、サーバーにアクセスできません。",
-          "createDirFailed": "ディレクトリの作成に失敗しました",
-          "connectionTimeOut": "接続タイムアウト、ネットワークまたはサーバーを確認してください。"
-        }
-      },
       "localBackup": {
         "tabTitle": "ローカルバックアップ",
         "export": {
           "title": "バックアップのエクスポート",
           "desc": "アプリケーションデータを .zip ファイルにパッケージし、指定した場所に保存します。",
           "button": "場所を選択してエクスポート",
+          "simpleButton": "エクスポート",
           "exporting": "エクスポート中..."
         },
         "import": {
@@ -620,6 +1050,112 @@
       "codeTheme": "コードブロックのハイライトテーマ",
       "selectTheme": "テーマを選択"
     },
+    "chat": {
+      "title": "会話設定",
+      "desc": "ここでは、要約生成など会話関連の設定を構成できます。",
+      "primaryModel": {
+        "title": "メインモデル",
+        "model": {
+          "title": "メインチャットモデル",
+          "desc": "日常会話に使用するメインの AI モデルを選択"
+        }
+      },
+      "toolbar": {
+        "title": "ツールバー設定",
+        "chatToolbar": {
+          "title": "チャットツールバー",
+          "desc": "チャットツールバーボタンの表示順序と可視性をカスタマイズ",
+          "button": "設定",
+          "modelSelect": {
+            "desc": "会話に使用する AI モデルを切り替え"
+          },
+          "promptSelect": {
+            "desc": "会話で使用するプリセットプロンプトを選択"
+          },
+          "chatLanguage": {
+            "desc": "会話の言語を設定"
+          },
+          "chatLink": {
+            "title": "タグをリンク",
+            "desc": "現在のタグのノート内容を会話コンテキストにリンク"
+          },
+          "fileLink": {
+            "desc": "ファイルまたはフォルダーを会話コンテキストにリンク"
+          },
+          "mcpButton": {
+            "desc": "MCP サーバーを選択して接続し、外部ツールを使用"
+          },
+          "ragSwitch": {
+            "title": "ナレッジベース",
+            "desc": "ベクトルナレッジベース検索を有効にする"
+          },
+          "clipboardMonitor": {
+            "title": "クリップボード監視",
+            "desc": "クリップボードの内容の変更を自動監視"
+          },
+          "newChat": {
+            "desc": "新しい会話を開始"
+          },
+          "clearContext": {
+            "desc": "会話コンテキストをクリアし、チャット履歴を保持"
+          },
+          "clearChat": {
+            "desc": "すべてのチャット記録を削除"
+          }
+        }
+      },
+      "condense": {
+        "title": "会話の要約",
+        "enable": {
+          "title": "要約を有効にする",
+          "desc": "長い会話を自動的に圧縮してトークン使用量を節約"
+        },
+        "model": {
+          "title": "要約モデル",
+          "desc": "要約生成に使用する AI モデルを選択",
+          "placeholder": "メインモデルを使用"
+        },
+        "threshold": {
+          "title": "トリガーしきい値",
+          "desc": "AI メッセージがこの数を超えたときに圧縮をチェック"
+        },
+        "minToken": {
+          "title": "最小トークン数",
+          "desc": "このトークン数を超えるメッセージのみを圧縮"
+        },
+        "keepLatest": {
+          "title": "最新を保持",
+          "desc": "最新の N 件の AI メッセージを圧縮しない"
+        },
+        "maxLength": {
+          "title": "要約の最大長",
+          "desc": "生成される要約の最大文字数を制御"
+        },
+        "prompt": {
+          "title": "カスタム要約プロンプト",
+          "desc": "要約生成に使用するプロンプトテンプレートをカスタマイズ",
+          "label": "プロンプトテンプレート",
+          "placeholder": "カスタムプロンプトを入力...",
+          "help": "元のコンテンツのプレースホルダーとして {content} を使用",
+          "save": "保存",
+          "reset": "デフォルトにリセット"
+        }
+      },
+      "inspiration": {
+        "title": "インスピレーションモデル",
+        "model": {
+          "title": "クイックプロンプト生成",
+          "desc": "会話を開始するためのクイックプロンプト候補を生成します"
+        }
+      },
+      "conversationTitle": {
+        "title": "会话标题",
+        "model": {
+          "title": "标题生成模型",
+          "desc": "选择用于生成会话标题的 AI 模型"
+        }
+      }
+    },
     "dev": {
       "title": "開発者",
       "desc": "ここでは、ネットワークプロキシ、データクリーンアップ、設定ファイル管理などの開発者オプションを設定できます。",
@@ -673,7 +1209,9 @@
         "video": "動画",
         "audio": "音声",
         "embedding": "埋め込み",
-        "rerank": "再ランキング"
+        "rerank": "再ランキング",
+        "tts": "文本转语音",
+        "stt": "语音转文本"
       },
       "modelList": {
         "error": {
@@ -721,13 +1259,23 @@
           "desc": "Markdownエディタ用のAIインライン補完、GitHub Copilotに類似、素早く続きの内容を生成"
         },
         "poweredBy": "SiliconFlowによる技術サポート"
-      }
-    },
-    "ocr": {
-      "title": "OCR",
-      "languagePacks": "言語パック",
-      "checkModels": "在此查询全部模型",
-      "modelInstruction": "以逗号分隔，例如：eng,chi_sim"
+      },
+      "connectionFailed": "接続に失敗しました",
+      "enableStream": "ストリーミングレスポンス",
+      "enableStreamDesc": "ストリーミングレスポンスを有効にすると、生成中のコンテンツをリアルタイムで表示できますが、一部のモデルではこの機能がサポートされていない場合があります。",
+      "maxTokens": "最大出力トークン",
+      "maxTokensDesc": "1回の生成で出力するトークン数を制限します。空欄の場合はモデルまたはプロバイダーの既定値を使用します。",
+      "maxTokensPlaceholder": "モデルの既定値を使用",
+      "tokenLimitParam": "トークン制限パラメーター",
+      "tokenLimitParamDesc": "既定では max_completion_tokens を使用します。旧式の互換APIでは max_tokens を選択してください。",
+      "advancedParameters": "詳細パラメーター",
+      "selectConfig": "設定を選択してください",
+      "models": "モデルリスト",
+      "modelsDesc": "現在の設定のすべてのモデルをここで管理します。各モデルは異なるタイプとパラメータを持つことができます。",
+      "addModel": "モデルを追加",
+      "newModel": "新しいモデル",
+      "checkConnection": "接続をテスト",
+      "model": "モデル"
     },
     "file": {
       "title": "ファイル管理",
@@ -749,7 +1297,7 @@
         "noResults": "結果が見つかりません"
       },
       "info": {
-        "title": "ワークスペースの説明", 
+        "title": "ワークスペースの説明",
         "desc": "ワークスペースを変更した後、完全に反映させるにはアプリケーションを再起動する必要があります。新しいワークスペース内のファイルは再起動後に表示されます。"
       },
       "toast": {
@@ -764,8 +1312,8 @@
       },
       "assets": {
         "title": "アセット",
-        "desc": "執筆中のリソース（例：画像、ビデオ、ファイル等）の保存パスを設定します。現在編集中の markdown ファイルと同じレベルに保存されます。",
-        "select": "執筆中のリソースの保存パスを設定してください"
+        "desc": "アセットディレクトリ名を設定します。エディタでローカル画像を挿入すると、このディレクトリ名（assets や images など）が使われます。",
+        "select": "アセットディレクトリ名を設定してください。例: assets"
       }
     },
     "shortcuts": {
@@ -774,23 +1322,336 @@
       "resetDefaults": "リセットします",
       "clear": "クリア",
       "noShortcut": "未設定",
+      "recording": "新しいショートカットを押してください",
+      "conflictEditor": "エディタショートカット「{name}」と競合しています",
+      "conflictGlobal": "グローバルショートカット「{name}」と競合しています",
+      "globalShortcuts": {
+        "title": "グローバルショートカット",
+        "desc": "これらはシステムに登録され、NoteGen が前面になくても動作する場合があります。"
+      },
+      "editorShortcuts": {
+        "title": "エディタショートカット",
+        "desc": "Markdown エディタにフォーカスがあるときだけ動作します。",
+        "suggested": "推奨: {shortcut}",
+        "groups": {
+          "basic": "基本編集",
+          "format": "書式",
+          "ai": "AI",
+          "table": "表",
+          "insert": "挿入"
+        },
+        "commands": {
+          "undo": {
+            "title": "元に戻す",
+            "desc": "前の編集を元に戻します。"
+          },
+          "redo": {
+            "title": "やり直し",
+            "desc": "取り消した編集をやり直します。"
+          },
+          "setParagraph": {
+            "title": "段落",
+            "desc": "現在のブロックを段落にします。"
+          },
+          "toggleHeading1": {
+            "title": "見出し 1",
+            "desc": "見出しレベル 1 を切り替えます。"
+          },
+          "toggleHeading2": {
+            "title": "見出し 2",
+            "desc": "見出しレベル 2 を切り替えます。"
+          },
+          "toggleHeading3": {
+            "title": "見出し 3",
+            "desc": "見出しレベル 3 を切り替えます。"
+          },
+          "toggleHeading4": {
+            "title": "見出し 4",
+            "desc": "見出しレベル 4 を切り替えます。"
+          },
+          "toggleHeading5": {
+            "title": "見出し 5",
+            "desc": "見出しレベル 5 を切り替えます。"
+          },
+          "toggleHeading6": {
+            "title": "見出し 6",
+            "desc": "見出しレベル 6 を切り替えます。"
+          },
+          "openSearch": {
+            "title": "検索 / 置換",
+            "desc": "エディタ内検索を開きます。"
+          },
+          "openSlashCommand": {
+            "title": "Slash メニュー",
+            "desc": "カーソル位置でコマンドメニューを開きます。"
+          },
+          "toggleOutline": {
+            "title": "アウトライン",
+            "desc": "文書アウトラインの表示を切り替えます。"
+          },
+          "toggleBold": {
+            "title": "太字",
+            "desc": "太字を切り替えます。"
+          },
+          "toggleItalic": {
+            "title": "斜体",
+            "desc": "斜体を切り替えます。"
+          },
+          "toggleStrike": {
+            "title": "取り消し線",
+            "desc": "取り消し線を切り替えます。"
+          },
+          "toggleUnderline": {
+            "title": "下線",
+            "desc": "下線を切り替えます。"
+          },
+          "toggleInlineCode": {
+            "title": "インラインコード",
+            "desc": "インラインコードを切り替えます。"
+          },
+          "toggleHighlight": {
+            "title": "ハイライト",
+            "desc": "ハイライトを切り替えます。"
+          },
+          "openLinkInput": {
+            "title": "リンク",
+            "desc": "リンク入力を開きます。"
+          },
+          "toggleBlockquote": {
+            "title": "引用ブロック",
+            "desc": "引用ブロックを切り替えます。"
+          },
+          "toggleBulletList": {
+            "title": "箇条書き",
+            "desc": "箇条書きを切り替えます。"
+          },
+          "toggleOrderedList": {
+            "title": "番号付きリスト",
+            "desc": "番号付きリストを切り替えます。"
+          },
+          "toggleTaskList": {
+            "title": "タスクリスト",
+            "desc": "タスクリストを切り替えます。"
+          },
+          "toggleCodeBlock": {
+            "title": "コードブロック",
+            "desc": "コードブロックを切り替えます。"
+          },
+          "quoteToChat": {
+            "title": "チャットへ引用",
+            "desc": "選択内容を AI チャットの引用に送ります。"
+          },
+          "openAiMenu": {
+            "title": "AI アクションメニュー",
+            "desc": "選択テキストの AI 操作を開きます。"
+          },
+          "aiContinue": {
+            "title": "AI 続き書き",
+            "desc": "カーソル前の内容から続きを書きます。"
+          },
+          "aiPolish": {
+            "title": "AI 推敲",
+            "desc": "選択テキストを推敲します。"
+          },
+          "aiConcise": {
+            "title": "AI 要約",
+            "desc": "選択テキストを簡潔にします。"
+          },
+          "aiExpand": {
+            "title": "AI 展開",
+            "desc": "選択テキストを展開します。"
+          },
+          "aiTranslate": {
+            "title": "AI 翻訳",
+            "desc": "選択テキストの翻訳メニューを開きます。"
+          },
+          "acceptAiSuggestion": {
+            "title": "AI 提案を採用",
+            "desc": "AI 提案パネルが開いているときに採用します。"
+          },
+          "rejectAiSuggestion": {
+            "title": "AI 提案を却下",
+            "desc": "AI 提案パネルが開いているときに原文へ戻します。"
+          },
+          "abortAiGeneration": {
+            "title": "AI 生成を停止",
+            "desc": "現在の AI 生成を停止します。"
+          },
+          "insertTable": {
+            "title": "表を挿入",
+            "desc": "既定の 3 列テーブルを挿入します。"
+          },
+          "addColumnBefore": {
+            "title": "左に列を挿入",
+            "desc": "現在のセルの左に列を挿入します。"
+          },
+          "addColumnAfter": {
+            "title": "右に列を挿入",
+            "desc": "現在のセルの右に列を挿入します。"
+          },
+          "addRowBefore": {
+            "title": "上に行を挿入",
+            "desc": "現在のセルの上に行を挿入します。"
+          },
+          "addRowAfter": {
+            "title": "下に行を挿入",
+            "desc": "現在のセルの下に行を挿入します。"
+          },
+          "deleteColumn": {
+            "title": "列を削除",
+            "desc": "現在の列を削除します。"
+          },
+          "deleteRow": {
+            "title": "行を削除",
+            "desc": "現在の行を削除します。"
+          },
+          "deleteTable": {
+            "title": "表を削除",
+            "desc": "現在の表を削除します。"
+          },
+          "alignLeft": {
+            "title": "左揃え",
+            "desc": "テキストまたはセルを左揃えにします。"
+          },
+          "alignCenter": {
+            "title": "中央揃え",
+            "desc": "テキストまたはセルを中央揃えにします。"
+          },
+          "alignRight": {
+            "title": "右揃え",
+            "desc": "テキストまたはセルを右揃えにします。"
+          },
+          "insertImage": {
+            "title": "画像を挿入",
+            "desc": "ローカル画像を選択して挿入します。"
+          },
+          "insertInlineMath": {
+            "title": "インライン数式を挿入",
+            "desc": "インライン LaTeX 入力を開きます。"
+          },
+          "insertBlockMath": {
+            "title": "ブロック数式を挿入",
+            "desc": "ブロック LaTeX 入力を開きます。"
+          },
+          "insertMermaid": {
+            "title": "Mermaid 図を挿入",
+            "desc": "既定の Mermaid フローチャートを挿入します。"
+          },
+          "insertHorizontalRule": {
+            "title": "区切り線を挿入",
+            "desc": "カーソル位置に水平線を挿入します。"
+          }
+        }
+      },
       "shortcuts": {
         "openWindow": {
           "title": "ウィンドウを開く/隠す",
           "desc": "主ウィンドウを開く/隠す。"
+        },
+        "screenshotRecord": {
+          "title": "スクリーンショット記録",
+          "desc": "スクリーンショット記録を開き、ウィンドウまたは画面を切り抜いて保存します。"
         },
         "quickRecordText": {
           "title": "テキストを素早く記録します",
           "desc": "主ウィンドウを開き、テキスト記録を表示します。"
         }
       }
-    }
+    },
+    "skills": {
+      "title": "Skills",
+      "desc": "Skills 是可重用的 AI 能力包，让 AI 助手能够根据任务自动应用特定的行为模式。",
+      "enable": "启用 Skills 功能",
+      "enableDesc": "启用后，AI 可以使用已配置的 Skills",
+      "autoMatch": "自动匹配 Skills",
+      "autoMatchDesc": "根据用户输入自动选择合适的 Skills",
+      "project": "工作区 Skills",
+      "global": "全局 Skills",
+      "globalPath": "全局 Skills 存储位置",
+      "openInFileManager": "在文件管理器中打开",
+      "createSkill": "创建 Skill",
+      "editSkill": "编辑 Skill",
+      "deleteSkill": "删除 Skill",
+      "exportSkill": "导出 Skill",
+      "importSkill": "导入 Skill",
+      "selectSkillZip": "选择 Skill zip 文件",
+      "importSuccess": "导入成功",
+      "importError": "导入失败",
+      "imported": "已导入",
+      "importing": "导入中...",
+      "skillName": "Skill 名称",
+      "skillDescription": "描述",
+      "skillVersion": "版本",
+      "skillAuthor": "作者",
+      "allowedTools": "允许使用的工具",
+      "userInvocable": "在斜杠菜单显示",
+      "instructions": "指令内容",
+      "instructionsPlaceholder": "输入给 AI 的详细指令...",
+      "importHelp": "支持导入 zip 格式的 Skill，zip 文件需包含 SKILL.md 文件。",
+      "metadata": "元数据",
+      "content": "指令内容",
+      "noSkills": "还没有 Skills",
+      "noSkillsDesc": "创建或导入 Skills 以开始使用",
+      "noSkillsGlobal": "还没有全局 Skills",
+      "noSkillsGlobalDesc": "创建或导入 Skills 以在所有项目中使用",
+      "emptyWorkspace": "工作区中没有 Skills",
+      "emptyWorkspaceDesc": "在 skills 文件夹中创建 SKILL.md 文件来添加 Skill",
+      "basicSettings": "基础设置",
+      "installedGlobalSkills": "已安装的全局 Skills",
+      "nameRequired": "请输入 Skill 名称",
+      "descriptionRequired": "请输入描述",
+      "namePlaceholder": "note-organizer",
+      "versionPlaceholder": "1.0.0",
+      "descriptionPlaceholder": "自动整理和优化笔记结构...",
+      "authorPlaceholder": "Your Name",
+      "descriptionHelp": "用于 AI 匹配，描述此 Skill 的功能和适用场景",
+      "allowedToolsHelp": "这些工具使用时不需要用户确认",
+      "userInvocableHelp": "用户可以通过 /skill-name 手动触发",
+      "instructionsHelp": "给 AI 的详细指令，支持 Markdown 格式",
+      "deleteSkillTitle": "删除 Skill",
+      "deleteSkillDesc": "确定要删除这个 Skill 吗？此操作无法撤销。",
+      "skillDeleted": "Skill 删除成功"
+    },
+    "audio": {
+      "title": "语音设置",
+      "desc": "在这里，你可以配置语音相关设置，包括文本转语音（朗读）和语音转文本（录音识别）功能。",
+      "mode": {
+        "title": "モード",
+        "auto": "自動（推奨）",
+        "local": "ローカルのみ",
+        "model": "モデルのみ"
+      },
+      "tts": {
+        "title": "文本转语音（TTS）",
+        "desc": "配置朗读功能，为聊天内容提供语音播放。",
+        "modeDesc": "既定ではブラウザとシステム音声を優先し、必要な場合のみモデルを使って体験を強化します。",
+        "model": {
+          "title": "朗读模型",
+          "desc": "任意です。自動モードの強化やモデル専用モードで利用できます。"
+        },
+        "speed": {
+          "title": "语速",
+          "desc": "调整语音播放的速度，范围从0.5倍到2倍速度，默认为1倍正常速度。"
+        }
+      },
+      "stt": {
+        "title": "语音转文本（STT）",
+        "desc": "配置录音识别功能，将语音转换为文字记录。",
+        "modeDesc": "既定ではブラウザ標準認識を優先し、ローカル利用不可時のみモデルへフォールバックします。",
+        "model": {
+          "title": "识别模型",
+          "desc": "任意です。自動フォールバック用、またはモデル専用モードで使用できます。"
+        }
+      }
+    },
+    "title": "設定"
   },
   "record": {
     "trash": {
       "title": "ゴミ箱を空にする",
       "confirm": "本当にデータをクリアしますか？",
       "records": "{count}件の記録が復元可能です",
+      "syncWarning": "この操作は他のデバイスにも同期されます。",
       "empty": "空にする",
       "close": "ゴミ箱を閉じる"
     },
@@ -805,9 +1666,83 @@
       "record": "記録",
       "detected": "検出済み"
     },
+    "capture": {
+      "saveTarget": "保存先",
+      "saveTargetPlaceholder": "タグを選択",
+      "saved": "記録を保存しました",
+      "savedWithType": "{type} を保存しました。続けて編集または整理できます。",
+      "viewRecord": "表示",
+      "processingInBackground": "バックグラウンドで処理中です。完了後、記録一覧に表示されます。",
+      "elapsedSeconds": "{seconds}s",
+      "importAudio": "音声をインポート",
+      "smartClipboard": "クリップボード",
+      "clipboardEmpty": "クリップボードは空です",
+      "clipboardEmptyDescription": "テキストまたはリンクをコピーしてから再試行してください。",
+      "linkFetchFailed": "Webページ内容の取得に失敗しました",
+      "fileUnsupportedSaved": "ファイルを保存しました",
+      "fileUnsupportedDescription": "このファイル形式のテキスト抽出は未対応のため、添付として保存しました。",
+      "fileUnsupportedContent": "このファイル形式のテキスト抽出は未対応です。元ファイルのパスを保存しました。",
+      "fileReadFailed": "ファイルのテキスト読み取りに失敗しました。元ファイルのパスを保存しました。",
+      "imageUploadFallback": "画像をローカルに保存しました",
+      "imageUploadFallbackDescription": "画像ホストへのアップロードに失敗したため、ローカル画像を使用します。",
+      "screenshotRecordTitle": "スクリーンショット記録",
+      "screenshotCapturing": "取得可能なウィンドウをキャプチャ中...",
+      "screenshotCaptureFailed": "画面をキャプチャできません",
+      "screenshotPermissionHint": "システムの画面収録権限を確認してから再試行してください。",
+      "screenshotEmpty": "キャプチャ可能なウィンドウがありません",
+      "screenshotSourceCount": "{count} 件のウィンドウが利用可能",
+      "screenshotNoSource": "利用可能なウィンドウはありません",
+      "screenshotRefresh": "再取得",
+      "retry": "再試行",
+      "screenshotSave": "スクリーンショットを保存",
+      "screenshotSaveAndRecognize": "保存して認識",
+      "screenshotSaveOnly": "スクリーンショットのみ保存",
+      "screenshotSaveFailed": "スクリーンショット記録の保存に失敗しました",
+      "screenshotRecognitionPending": "スクリーンショットを保存しました。画像認識中...",
+      "screenshotRecognitionComplete": "画像認識が完了しました",
+      "screenshotRecognitionFailed": "画像認識に失敗しました",
+      "screenshotRecognitionAuto": "自動",
+      "screenshotRecognitionOff": "認識オフ",
+      "screenshotRecognitionMethod": "認識",
+      "screenshotNoText": "このスクリーンショットから文字を認識できませんでした",
+      "screenshotSavedOnly": "認識せずに画像を保存しました",
+      "screenshotRecognizing": "認識中...",
+      "screenshotRecognizeAgain": "再認識",
+      "screenshotAiDescription": "AI 説明",
+      "screenshotOcrContent": "OCR 内容",
+      "screenshotCopyImageLink": "画像リンクをコピー",
+      "screenshotShowInFolder": "フォルダで表示",
+      "screenshotKeyboardHint": "Enter で保存、Esc でキャンセル、矢印キーでソース切替。",
+      "screenshotModeWindow": "ウィンドウ",
+      "screenshotModeRegion": "範囲",
+      "screenshotModeDisplay": "ディスプレイ"
+    },
+    "syncStatus": {
+      "checking_remote": "リモート更新を確認中",
+      "queued": "同期キューに追加済み",
+      "uploading": "同期内容をアップロード中",
+      "uploadingRecords": "記録をアップロード中",
+      "uploadingSettings": "設定をアップロード中",
+      "downloading": "リモート内容を取得中",
+      "failed": "同期に失敗しました",
+      "conflict": "同期の競合を検出しました",
+      "waiting_provider": "同期プロバイダーの設定待ち",
+      "synced": "同期済み",
+      "queuedDesc": "{count} 件の同期タスクが待機中",
+      "retry": "再試行",
+      "settings": "設定"
+    },
     "mark": {
       "empty": "記録はまだありません",
       "loading": "読み込み中...",
+      "detail": {
+        "notFound": "記録が存在しないか、削除されています",
+        "moreActions": "その他の操作",
+        "tag": "タグ",
+        "discardTitle": "未保存の変更を破棄しますか？",
+        "discardDescription": "このページを離れると、変更内容は保存されません。",
+        "discard": "変更を破棄"
+      },
       "type": {
         "scan": "スキャン",
         "image": "イラスト",
@@ -820,7 +1755,8 @@
         "upload": "アップロード",
         "download": "ダウンロード",
         "uploadTo": "ローカルから {provider} へ同期",
-        "downloadFrom": "{provider} からローカルへ同期"
+        "downloadFrom": "{provider} からローカルへ同期",
+        "recording": "录音"
       },
       "uploadSuccess": "記録アップロード成功",
       "downloadSuccess": "記録ダウンロード成功",
@@ -829,7 +1765,9 @@
       "createdAt": "作成日時",
       "progress": {
         "cacheImage": "画像をキャッシュ",
+        "vlm": "VLM 認識",
         "ocr": "OCR 認識",
+        "description": "説明を生成",
         "aiAnalysis": "AI 認識",
         "uploadImage": "画像ホストへアップロード",
         "jsdelivrCache": "jsdelivr キャッシュ通知",
@@ -928,7 +1866,9 @@
           },
           "placeholder": {
             "default": "質問したり記録を文章に整理したりできます...",
-            "noApiKey": "API Keyが設定されていないため、AI対話機能を使用できません..."
+            "noApiKey": "API Keyが設定されていないため、AI対話機能を使用できません...",
+            "on": "AI提案オン",
+            "off": "AI提案オフ"
           },
           "header": {
             "configApiKey": "API KEYを設定",
@@ -950,7 +1890,8 @@
             }
           },
           "messageControl": {
-            "words": "文字"
+            "words": "文字",
+            "summary": "要約"
           },
           "mcp": {
             "maxIterationsReached": "最大ツール呼び出し回数に達しました",
@@ -969,10 +1910,10 @@
             "subtitle": "ChatまたはAgentモードでAIと対話",
             "currentModel": "現在のモデル",
             "currentPrompt": "現在のPrompt",
-            "currentMode": "会話モード",
             "noModel": "モデルが設定されていません",
             "noPrompt": "Promptが設定されていません",
-            "configureModel": "モデルを設定"
+            "modeHint": "入力ボックスの左側の",
+            "modeHintSuffix": "ボタンをクリックして会話モードを切り替え"
           },
           "content": {
             "organize": "あなたの記録を文章に整理："
@@ -1043,6 +1984,7 @@
         "viewFile": "元ファイルを表示",
         "deleteForever": "完全に削除",
         "multiSelect": "複数選択",
+        "multiSelectMode": "複数選択モード",
         "exitMultiSelect": "複数選択を終了",
         "selectAll": "すべて選択",
         "deselectAll": "すべて選択解除",
@@ -1060,28 +2002,51 @@
         "image": "画像アップロード",
         "link": "リンク記録",
         "file": "ファイルアップロード",
-        "todo": "Todo記録"
+        "todo": "Todo記録",
+        "closeTrash": "ゴミ箱を閉じる"
       },
       "list": {
         "title": "記録"
+      },
+      "note": {
+        "organizeAs": "整理先",
+        "template": "テンプレート",
+        "setting": "設定",
+        "confirm": "确认",
+        "cancel": "取消",
+        "removeThinking": "移除思考过程",
+        "stop": "停止"
       }
     },
     "chat": {
       "empty": {
-        "features": [
-          {
-            "chat": "AIボットと対話する"
-          },
-          {
-            "linked": "あなたの記録に関連付けられています"
-          },
-          {
-            "clipboard": "クリップボードの記録を識別"
-          },
-          {
-            "organize": "あなたの記録をノートに整理します"
-          }
-        ]
+        "title": "AIとの会話を開始",
+        "subtitle": "チャットまたはエージェントモードでAIと対話",
+        "temporary": {
+          "title": "一時チャット",
+          "description": "このチャットを離れると、会話内容は消去されます"
+        },
+        "currentModel": "現在のモデル",
+        "currentPrompt": "現在のプロンプト",
+        "currentMode": "会話モード",
+        "noModel": "モデルが設定されていません",
+        "noPrompt": "プロンプトが設定されていません",
+        "configureModel": "モデルを設定",
+        "recentConversations": "最近の会話",
+        "deleteConversation": "会話を削除",
+        "conversationHistory": "会話履歴",
+        "viewMore": "もっと見る",
+        "messages": "件のメッセージ",
+        "searchPlaceholder": "会話を検索...",
+        "noMatchingConversations": "一致する会話が見つかりませんでした",
+        "noConversationHistory": "まだ会話履歴がありません",
+        "quickPrompts": {
+          "title": "快速开始",
+          "writeNote": "帮我写一篇笔记",
+          "summarize": "帮我总结这段内容",
+          "brainstorm": "帮我头脑风暴一些想法",
+          "explain": "帮我解释这个概念"
+        }
       },
       "newChat": "新しいタグで対話を開始",
       "removeChat": "現在のタグの対話を削除",
@@ -1094,6 +2059,7 @@
         "chat": "チャット",
         "placeholder": {
           "default": "メッセージを入力...",
+          "steering": "現在のタスクを調整する情報を追加...",
           "noApiKey": "API Keyが設定されていないため、AIチャットを使用できません...",
           "on": "AIサジェスト有効",
           "off": "AIサジェスト無効",
@@ -1113,6 +2079,7 @@
           "tooltip": "MCP サーバー"
         },
         "send": "送信",
+        "steer": "タスクを調整",
         "stop": "停止",
         "terminate": "終了",
         "tagLink": {
@@ -1148,10 +2115,24 @@
           "translate": "翻訳モード"
         },
         "chatModeSelect": {
-          "chatDescription": "クイック会話、読み取り専用モード",
+          "chatDescription": "クイック会話、分析優先",
           "agentDescription": "スマートアシスタント、アクション実行可能"
         },
         "attachImage": "画像を添付",
+        "imageAttachment": {
+          "selectSuccess": "{count} 枚の画像を添付しました",
+          "pasteSuccess": "{count} 枚の画像を貼り付けました",
+          "dropSuccess": "{count} 枚の画像をドロップしました",
+          "maxCount": "添付できる画像は最大 {count} 枚です",
+          "oversized": "{name} は {size} を超えているためスキップしました",
+          "oversizedMultiple": "{count} 枚の画像が {size} を超えているためスキップしました",
+          "unsupported": "{name} は対応していない画像形式です",
+          "unsupportedMultiple": "{count} 個のファイルは対応していない画像形式です",
+          "saveFailed": "画像の保存に失敗しました。もう一度お試しください",
+          "saveFailedMultiple": "{count} 枚の画像の保存に失敗しました。もう一度お試しください",
+          "selectFailed": "画像の選択に失敗しました。もう一度お試しください",
+          "dropHint": "離すと画像を添付します"
+        },
         "agent": {
           "running": "エージェント実行中",
           "thinking": "思考中",
@@ -1159,6 +2140,10 @@
           "acting": "実行中",
           "observation": "観察結果",
           "toolCalls": "ツール呼び出し",
+          "autoFinal": {
+            "createNote": "ノート「{name}」を作成しました。",
+            "createFile": "ファイル「{name}」を作成しました。"
+          },
           "thought": "思考",
           "action": "行動",
           "confirmation": {
@@ -1167,7 +2152,9 @@
             "tool": "ツール",
             "parameters": "パラメータ",
             "cancel": "キャンセル",
-            "confirm": "確認"
+            "confirm": "確認",
+            "confirmed": "確認済み",
+            "cancelled": "キャンセル済み"
           }
         },
         "imageSelector": {
@@ -1186,7 +2173,10 @@
           "searchPlaceholder": "ファイルを検索...",
           "noFiles": "ファイルが見つかりません",
           "loading": "読み込み中..."
-        }
+        },
+        "stopped": "对话已终止",
+        "newChat": "新しいチャット",
+        "temporaryChat": "一時チャット"
       },
       "header": {
         "configApiKey": "API KEY の設定",
@@ -1210,6 +2200,7 @@
       },
       "messageControl": {
         "words": "字",
+        "summary": "要約",
         "readAloud": "音声読み上げ",
         "playing": "再生中",
         "loading": "準備中",
@@ -1258,11 +2249,69 @@
         "filterThinkingContent": "思考の記録を削除します",
         "startOrganize": "開始整理",
         "manageTemplate": "管理テンプレート",
-        "cancel": "キャンセル"
+        "quickOrganize": "クイック整理",
+        "quickOrganizeHelp": "現在のテンプレートと既定設定を使い、記録選択と生成設定をスキップして整理を開始します。",
+        "templateManager": "テンプレート管理",
+        "moreTemplates": "もっと見る",
+        "searchTemplates": "テンプレートを検索",
+        "showMore": "展開",
+        "showLess": "折りたたむ",
+        "recordCount": "{count} 件の記録",
+        "recordPreview": "記録プレビュー",
+        "previewEmpty": "選択範囲にプレビューできる記録がありません",
+        "previewMore": "最新 {count} 件を表示",
+        "selectTemplate": "テンプレートを選択",
+        "stepTemplate": "整理テンプレート",
+        "templateStepDescription": "AI がノートをどう構成し、何を重視し、どの記録範囲を使うかを決めます。",
+        "stepRecords": "記録を選択",
+        "recordsStepDescription": "今回使う記録を選び、タグで範囲を切り替え、不要な内容を外せます。",
+        "stepSettings": "生成設定",
+        "settingsStepDescription": "出力タイトル、保存先、素材の扱い、この整理の追加要件を設定します。",
+        "nextStep": "次へ",
+        "previousStep": "前へ",
+        "generationSettings": "生成設定",
+        "generationSettingsHelp": "出力言語、タイトル、保存先、含める内容を確認します。",
+        "outputLanguage": "出力言語",
+        "outputLanguageAuto": "アプリの言語に従う",
+        "outputLanguageZh": "简体中文",
+        "outputLanguageZhTW": "繁體中文",
+        "outputLanguageEn": "English",
+        "outputLanguageJa": "日本語",
+        "outputLanguagePtBR": "Português",
+        "outputLanguageCustom": "カスタム",
+        "outputLanguageCustomPlaceholder": "例：フランス語を使う、または自然な会話調の中国語を使う",
+        "outputLanguageHelp": "一般的な言語を選ぶか、カスタムを選んで出力言語の要件を手動で入力できます。",
+        "articleTitle": "記事タイトル",
+        "articleTitlePlaceholder": "空欄の場合は AI がタイトルを生成します",
+        "saveFolder": "保存先",
+        "saveFolderRoot": "ルートディレクトリ",
+        "currentSaveFolder": "現在の保存先",
+        "noFolderAvailable": "利用可能なフォルダーがありません",
+        "includeImages": "画像を含める",
+        "includeReferences": "参照リンクを残す",
+        "additionalRequirement": "追加要件",
+        "additionalRequirementPlaceholder": "今回の整理に関する特別な要件を追加",
+        "selectedRecordCount": "{selected}/{total} 件を選択中",
+        "selectAllRecords": "すべて選択",
+        "clearRecordSelection": "クリア",
+        "useRecord": "この記録を使用",
+        "recordSelectionHelp": "AI に使わせたくない記録のチェックを外します。画像と録音はここでプレビューできます。",
+        "noRecordsSelected": "少なくとも 1 件の記録を選択してください",
+        "noRecords": "整理できる記録がありません",
+        "noRecordsInRange": "選択範囲に記録がありません",
+        "noTemplateAvailable": "利用可能なテンプレートがありません",
+        "copyTemplate": "テンプレートをコピー",
+        "copySuffix": "コピー",
+        "cancel": "キャンセル",
+        "stop": "停止"
       },
       "mark": {
         "recorded": "記録済み",
         "record": "記録"
+      },
+      "condensing": "正在压缩上下文...",
+      "condensed": {
+        "message": "已压缩 {count} 条历史消息"
       }
     },
     "tag": {
@@ -1287,6 +2336,14 @@
     "record": "記録",
     "quickRecord": "クイック記録",
     "write": "執筆",
+    "me": "マイ",
+    "mobileDock": {
+      "chat": "チャット",
+      "record": "記録",
+      "quickRecord": "クイック",
+      "write": "執筆",
+      "me": "マイ"
+    },
     "search": "検索",
     "githubImageHosting": "Github 画像ホスティング",
     "login": "ログイン",
@@ -1294,129 +2351,55 @@
     "view": "表示",
     "logout": "ログアウト",
     "setting": "設定",
+    "activity": "アクティビティ",
     "files": "ノート",
     "outline": "アウトライン",
     "hideLeftSidebar": "左サイドバーを非表示",
     "showLeftSidebar": "左サイドバーを表示",
     "hideRightSidebar": "右サイドバーを非表示",
     "showRightSidebar": "右サイドバーを表示",
-    "searchPlaceholder": "ノートまたは記録を検索..."
+    "searchPlaceholder": "ノートまたは記録を検索...",
+    "showCenterPanel": "显示编辑器",
+    "hideCenterPanel": "隐藏编辑器",
+    "navigate": "ナビゲーション"
   },
-  "chat": {
-    "placeholder": {
-      "default": "メッセージを入力...",
-      "noApiKey": "無 API KEY 設定、AI 話題できません...",
-      "on": "AIサジェスト有効",
-      "off": "AIサジェスト無効",
-      "noPrimaryModel": "無主模型設定、AI 話題できません..."
+  "activity": {
+    "title": "アクティビティカレンダー",
+    "description": "記録、対話、執筆の活動を日ごとに確認できます。初版では既存の記録、ユーザー対話、ノート更新時刻をもとに集計します。",
+    "drawer": {
+      "title": "アクティビティ",
+      "description": "今日の状態と最近の活動傾向をすばやく確認できます。",
+      "today": "今日"
     },
-    "translate": {
-      "tooltip": "翻訳",
-      "translating": "翻訳中...",
-      "showOriginal": "原文表示",
-      "alreadyTranslated": "翻訳済み"
+    "loading": "アクティビティデータを読み込み中...",
+    "empty": "まだアクティビティデータがありません",
+    "refresh": "更新",
+    "summary": {
+      "totalCount": "総アクティビティ",
+      "activeDays": "活動日数",
+      "records": "記録回数",
+      "chats": "対話回数",
+      "writing": "執筆活動"
     },
-    "clipboardMonitor": {
-      "enable": "クリップボード監視(有効)",
-      "disable": "クリップボード監視(無効)"
+    "labels": {
+      "record": "記録",
+      "writing": "執筆",
+      "chat": "対話"
     },
-    "mcp": {
-      "tooltip": "MCP サーバー"
+    "heatmap": {
+      "title": "直近 26 週間",
+      "range": "{startDate} - {endDate}",
+      "less": "少",
+      "more": "多",
+      "dayCount": "件の活動",
+      "emptyDay": "活動なし"
     },
-    "send": "送信",
-    "stop": "停止",
-    "terminate": "終了",
-    "tagLink": {
-      "on": "タグとリンク済み",
-      "off": "タグとリンクなし"
-    },
-    "modelSelect": {
-      "tooltip": "AIモデルを選択",
-      "placeholder": "AIモデルを検索",
-      "noModel": "モデルが見つかりません"
-    },
-    "promptSelect": {
-      "tooltip": "プロンプトを選択",
-      "placeholder": "プロンプトを検索"
-    },
-    "clearChat": "会話をクリア",
-    "clearContext": {
-      "tooltip": "コンテキストをクリア"
-    },
-    "chatLanguage": {
-      "tooltip": "会話言語を選択",
-      "placeholder": "言語を検索"
-    },
-    "rag": {
-      "notSupported": "ベクトルモデルが利用できません",
-      "enabled": "知識ベース検索有効",
-      "disabled": "知識ベース検索無効"
-    },
-    "modeSelect": {
-      "tooltip": "入力モードを選択",
-      "chat": "チャットモード",
-      "gen": "整理モード",
-      "translate": "翻訳モード"
-    },
-    "fileLink": {
-      "tooltip": "ファイルをリンク",
-      "selectFile": "ファイルを選択",
-      "linkedFile": "リンクされたファイル",
-      "searchPlaceholder": "ファイルを検索...",
-      "noFiles": "ファイルが見つかりません",
-      "loading": "読み込み中..."
+    "detail": {
+      "title": "当日の詳細",
+      "empty": "日付を選択すると当日の活動詳細が表示されます。"
     }
-  },
-  "header": {
-    "configApiKey": "API KEY の設定",
-    "clearChat": "チャットをクリア",
-    "configPrompt": "マスクの設定",
-    "selectPrompt": "マスクを選択",
-    "noModel": "AI モデルが選択されていません"
-  },
-  "clipboard": {
-    "image": {
-      "detected": "クリップボードに画像が存在します：",
-      "recording": "記録中",
-      "recorded": "記録済み",
-      "record": "記録"
-    },
-    "text": {
-      "detected": "クリップボードにテキストが存在します：",
-      "recorded": "記録済み",
-      "record": "記録"
-    }
-  },
-  "messageControl": {
-    "words": "字",
-    "readAloud": "音声読み上げ",
-    "playing": "再生中",
-    "loading": "準備中",
-    "stop": "停止",
-    "copy": "コピー",
-    "copied": "コピーしました"
-  },
-  "ragSources": {
-    "label": "参照ファイル"
-  },
-  "preview": {
-    "close": "关闭",
-    "copy": "复制",
-    "copied": "已复制！"
-  },
-  "control": {
-    "edit": "編集",
-    "save": "保存",
-    "cancel": "キャンセル",
-    "delete": "削除",
-    "deleteConfirm": "本当に削除しますか？"
-  },
-  "content": {
-    "organize": "将你的記録整理为文章："
   },
   "note": {
-    "organize": "整理",
-    "writing": "執筆",
     "convert": "文章に変換",
     "description": "現在のノートはAIによって生成され、編集できません。ノートを文章（ローカルファイル）に変換して、執筆ページで二次創作できます。",
     "filename": "ファイル名",
@@ -1424,14 +2407,7 @@
     "rootDirectory": "ルートディレクトリ",
     "deleteTag": "削除タグ、記録とノート（ゴミ箱で復元可能）",
     "warning": "変換後、執筆ページに移動します。",
-    "convert_button": "変換",
-    "organizeAs": "記録を整理します...",
-    "templateContent": "テンプレート内容",
-    "recordRange": "記録範囲を選択",
-    "filterThinkingContent": "思考の記録を削除します",
-    "startOrganize": "開始整理",
-    "manageTemplate": "管理テンプレート",
-    "cancel": "キャンセル"
+    "convert_button": "変換"
   },
   "search": {
     "placeholder": "ノートと記事を検索...",
@@ -1504,7 +2480,89 @@
           "title": "ワークスペースを開く",
           "desc": "ワークスペースディレクトリを選択または切り替え"
         }
+      },
+      "onboarding": {
+        "title": "初回ガイド",
+        "subtitle": "この 3 つのタスクで NoteGen の基本フローを体験できます。",
+        "dismiss": "オンボーディングをスキップ",
+        "reopen": "初回ガイドを再表示",
+        "start": "開始",
+        "viewHint": "ヒントを見る",
+        "continue": "次へ進む",
+        "completed": "完了",
+        "allDone": "スタートガイドのタスクはすべて完了しました。NoteGen の基本フローは体験済みです。",
+        "stepLabel": "タスク ({current}/{total})",
+        "stepCompletedLabel": "完了したタスク ({current}/{total})",
+        "afterOrganizeDialog": {
+          "title": "タスク完了 (2/3)",
+          "description": "記録をノートに整理できました。次は AI Agent を使って、このノートをバイリンガル版に翻訳してみますか？",
+          "confirm": "次へ進む",
+          "cancel": "今はしない"
+        },
+        "agentPrompt": {
+          "label": "サンプルプロンプト",
+          "use": "このプロンプトを使う",
+          "intro": "先ほど整理したこのノートを、中国語と英語のバイリンガル版に直接修正してください。",
+          "requirement1": "",
+          "requirement2": "",
+          "requirement3": "",
+          "requirement4": "",
+          "outro": ""
+        },
+        "steps": {
+          "createRecord": {
+            "title": "最初の記録を作成",
+            "desc": "サンプル記録を保存して、記録入口を覚えます。"
+          },
+          "organizeNote": {
+            "title": "ノートに整理",
+            "desc": "記録を正式なノートに整理します。"
+          },
+          "aiPolish": {
+            "title": "Agent でバイリンガル翻訳",
+            "desc": "AI Agent を使って、整理したノートをバイリンガル版に変換します。"
+          }
+        },
+        "completedStates": {
+          "create-record": {
+            "title": "最初の記録を作成しました",
+            "desc": "クイック記録の入口がどこにあるか分かりました。"
+          },
+          "organize-note": {
+            "title": "記録をノートに整理しました",
+            "desc": "次は AI でノートを編集してみましょう。"
+          },
+          "ai-polish": {
+            "title": "Agent でノートを処理しました",
+            "desc": "記録から整理、さらに Agent による処理まで、NoteGen の基本フローを体験できました。"
+          }
+        },
+        "spotlight": {
+          "create-record": {
+            "title": "ここからすぐに記録できます",
+            "desc": "この入口をクリックするとテキスト記録が開き、サンプル内容も自動で入ります。"
+          },
+          "organize-note": {
+            "title": "ここで記録をノートに整理します",
+            "desc": "このボタンで、保存した記録を Markdown ノートにまとめられます。"
+          },
+          "ai-polish": {
+            "title": "ここで今作成したノートを Agent に渡せます",
+            "desc": "サンプルプロンプトをチャットに入れて送信すると、Agent が現在のノートを元にバイリンガル版を生成します。"
+          }
+        }
       }
+    },
+    "unsupportedFile": {
+      "title": "このファイルをプレビューできません",
+      "fileName": "ファイル名",
+      "filePath": "ファイルパス",
+      "fileSize": "ファイルサイズ",
+      "modifiedTime": "更新日時",
+      "createdTime": "作成日時",
+      "pathCopied": "パスをコピーしました",
+      "openExternal": "外部アプリで開く",
+      "openDirectory": "ファイルのディレクトリを開く"
     },
     "file": {
       "toolbar": {
@@ -1527,7 +2585,6 @@
         "showCloudFiles": "クラウドファイルを表示",
         "processingVectors": "ベクトルデータ処理中",
         "calculateVectors": "知識庫計算（全量）",
-        "enableVectorDb": "ベクトルデータベースを有効化",
         "importMarkdown": "インポート",
         "importing": "インポート中...",
         "importSuccess": "インポート成功",
@@ -1539,6 +2596,26 @@
         "syncComplete": "同期完了",
         "pullingRemote": "リモートサーバーから最新コンテンツを取得中...",
         "pullComplete": "プル完了"
+      },
+      "mobile": {
+        "cancel": "キャンセル",
+        "create": "作成",
+        "save": "保存",
+        "emptyDir": "このディレクトリは空です",
+        "root": "ルート",
+        "openFiles": "ファイルを開く",
+        "remote": "リモートファイル",
+        "remoteFileNotPulled": "クラウドのみ · タップして取得",
+        "remoteFolderOnly": "クラウドのみのフォルダ",
+        "file": "ファイル",
+        "folder": "フォルダ",
+        "folderChildren": "{files} 個のファイル · {folders} 個のフォルダ",
+        "filePlaceholder": "example.md",
+        "folderPlaceholder": "example-folder",
+        "dragToParent": "ここにドロップして1つ上の階層へ移動",
+        "dragReleaseToMove": "離すとここへ移動",
+        "moveInvalidTarget": "このフォルダには移動できません",
+        "moveFailed": "移動に失敗しました"
       },
       "context": {
         "viewDirectory": "ディレクトリを表示",
@@ -1552,6 +2629,8 @@
         "confirmDelete": "フォルダ \"{name}\" を削除してもよろしいですか？この操作により、フォルダとその内容がすべて削除されます。",
         "deleteSuccess": "削除しました",
         "deleteFailed": "削除に失敗しました",
+        "moveFailed": "移動に失敗しました",
+        "invalidMoveTarget": "自身またはサブフォルダには移動できません",
         "newFile": "新規ファイル",
         "newFolder": "新規フォルダ",
         "syncFolder": "同期",
@@ -1589,6 +2668,7 @@
       },
       "folderView": {
         "vectorDbNotEnabled": "ベクターデッサースが有効ではありません",
+        "calculateVectors": "ベクトルを計算",
         "indexed": "インデックス済み",
         "vectorCount": "ベクター数",
         "databaseSize": "データベースサイズ",
@@ -1652,9 +2732,6 @@
         }
       },
       "toolbar": {
-        "organize": {
-          "tooltip": "ノート整理"
-        },
         "mark": {
           "title": "記録を使用",
           "tooltip": "記録を使用",
@@ -1690,8 +2767,27 @@
           "tooltip": "翻訳",
           "description": "選択したテキストを翻訳します",
           "selectContent": "まず内容を選択してください",
-          "promptTemplate": "このテキスト：\n{content}\nを{language}に翻訳してください。翻訳結果のみを返してください。"
+          "promptTemplate": "このテキスト：\n{content}\nを{language}に翻訳してください。翻訳結果のみを返してください。",
+          "fail": "翻訳に失敗しました",
+          "failNoSelection": "翻訳するテキストを選択してください",
+          "translating": "翻訳中",
+          "translatingTo": "{language}に翻訳中...",
+          "success": "翻訳完了",
+          "successTo": "{language}に翻訳されました",
+          "customLanguage": "カスタム言語...",
+          "customLanguagePlaceholder": "目標言語を入力、例：英語、日本語など",
+          "customLanguageEmpty": "目標言語を入力してください",
+          "customLanguageExample": "例：英語、日本語、フランス語など"
         }
+      },
+      "saveDialog": {
+        "title": "保存文件",
+        "emptyContent": "内容为空",
+        "emptyContentDesc": "请先输入内容后再保存",
+        "success": "保存成功",
+        "successDesc": "文件已保存",
+        "error": "保存失败",
+        "errorDesc": "文件保存失败，请重试"
       }
     },
     "footer": {
@@ -1740,6 +2836,40 @@
     }
   },
   "mobile": {
+    "me": {
+      "profile": {
+        "deviceName": "同期プラットフォーム",
+        "deviceSubtitle": "記録と設定を同期",
+        "syncPlatform": "同期プラットフォーム",
+        "gitSubtitle": "{provider} に接続して記録と設定を同期しています",
+        "storageSubtitle": "現在は {provider} を使って記録と設定を同期しています",
+        "unconfiguredSubtitle": "同期はまだ設定されていません。現在のデータはローカルのみに保存されています",
+        "streak": "{count}日連続でアクティブ"
+      },
+      "activity": {
+        "tip": "ヒートマップの日付をタップすると、その日のタイムラインを表示します。",
+        "range": "直近 {count} 週間",
+        "rangePlaceholder": "直近 16 週間",
+        "drawerEmpty": "日付を選択すると、その日の活動詳細を確認できます。",
+        "drawerSummary": "この日は合計 {total} 件の活動があり、記録 {record} 件、執筆 {writing} 件、対話 {chat} 件です。"
+      },
+      "sync": {
+        "title": "同期",
+        "configured": "接続済み",
+        "unconfigured": "未設定",
+        "localOnly": "ローカルのみ"
+      },
+      "stats": {
+        "weekly": "今週の活動",
+        "weeklyHint": "今週の累計活動回数",
+        "streak": "連続日数",
+        "streakHint": "連続して活動した日数"
+      },
+      "settings": {
+        "title": "設定",
+        "description": "ここから各機能の設定画面へ直接移動できます。"
+      }
+    },
     "chat": {
       "drawer": {
         "settings": {
@@ -1748,10 +2878,10 @@
         "tools": {
           "title": "ツール",
           "clearContext": "コンテキストをクリア",
-          "clearContextDesc": "会話のコンテキストをクリアし、チャット履歴を保持",
           "clearChat": "チャットをクリア",
-          "clearChatDesc": "すべてのチャット記録を削除",
-          "clear": "クリア"
+          "clear": "クリア",
+          "newChat": "开始新对话",
+          "start": "开始"
         },
         "attachments": {
           "title": "添付ファイル",
@@ -1788,12 +2918,21 @@
     "error": "エラー",
     "success": "成功",
     "noModelConfigured": "音声認識モデルが設定されていません。設定で構成してください",
+    "speechUnavailable": "現在の認識モードは利用できません。ローカル音声対応またはモデル設定を確認してください。",
+    "fallbackToModel": "ローカル音声認識が利用できないため、自動的にモデル文字起こしへ切り替えました。",
     "startError": "録音を開始できません",
     "noAudioData": "音声データが録音されていません",
     "transcriptionSuccess": "音声認識完了",
     "transcriptionEmpty": "認識結果が空です",
     "transcriptionError": "音声認識に失敗しました",
+    "configureModel": "モデルを設定",
+    "retryTranscription": "再認識",
+    "retrying": "再認識中...",
+    "retrySuccess": "再認識が完了しました",
+    "retryError": "再認識に失敗しました",
     "noContentDetected": "コンテンツが検出されませんでした",
+    "pendingTranscription": "元の音声を保存しました。再認識できます。",
+    "pendingModelConfiguration": "元の音声を保存しました。音声認識を設定すると文字起こしできます。",
     "doubleClickToSelectFile": "ダブルクリックで音声ファイルを選択",
     "mode": {
       "builtin": "ブラウザ認識",
@@ -1804,5 +2943,226 @@
   },
   "quickRecord": {
     "description": "記録ツールを選択して、素早く記録を作成"
+  },
+  "editor": {
+    "placeholder": "「/」を入力してメニューを開くか、直接書き始める...",
+    "outline": {
+      "title": "アウトライン",
+      "open": "アウトラインを開く",
+      "close": "アウトラインを閉じる",
+      "empty": "見出しがありません",
+      "noResults": "一致する見出しがありません",
+      "searchPlaceholder": "見出しを検索",
+      "clearSearch": "検索をクリア",
+      "expandHeading": "{title}を展開",
+      "collapseHeading": "{title}を折りたたむ",
+      "untitledHeading": "無題 H{level}",
+      "resizeHandle": "ドラッグしてアウトライン幅を変更",
+      "editHeading": "見出しを編集 {title}"
+    },
+    "translation": {
+      "fail": "翻訳に失敗しました",
+      "failNoSelection": "翻訳するテキストを選択してください",
+      "translating": "翻訳中...",
+      "translatingTo": "{language}に翻訳中...",
+      "success": "翻訳完了",
+      "successTo": "{language}に翻訳されました",
+      "customLanguageEmpty": "目標言語を入力してください",
+      "customLanguageExample": "例：英語、日本語、フランス語など"
+    },
+    "quoteDisplay": {
+      "fromFile": "{fileName}から引用",
+      "line": "{fileName}の{line}行目から引用",
+      "lines": "{fileName}の{start}-{end}行目から引用"
+    },
+    "bubbleMenu": {
+      "ai": "AI",
+      "polish": "添削",
+      "concise": "簡潔に",
+      "expand": "拡張",
+      "translate": "翻訳",
+      "translateSubtitle": "翻訳先",
+      "quoteToChat": "チャットに引用",
+      "link": "リンク",
+      "linkPlaceholder": "リンクURLを入力",
+      "confirm": "確認",
+      "cancel": "キャンセル",
+      "bold": "太字",
+      "italic": "斜体",
+      "strike": "取り消し線",
+      "underline": "下線",
+      "inlineCode": "インラインコード",
+      "highlight": "ハイライト",
+      "blockquote": "引用",
+      "bulletList": "箇条書き",
+      "orderedList": "番号付きリスト",
+      "taskList": "タスクリスト",
+      "codeBlock": "コードブロック",
+      "languages": {
+        "English": "英語",
+        "Japanese": "日本語",
+        "Korean": "韓国語",
+        "French": "フランス語",
+        "German": "ドイツ語",
+        "Spanish": "スペイン語",
+        "Portuguese": "ポルトガル語",
+        "Russian": "ロシア語",
+        "Arabic": "アラビア語"
+      },
+      "customLanguagePlaceholder": "カスタム言語..."
+    },
+    "aiSuggestion": {
+      "accept": "受け入れ",
+      "reject": "拒否",
+      "undo": "元に戻す",
+      "generating": "生成中...",
+      "abort": "中止"
+    },
+    "image": {
+      "insert": "画像を挿入",
+      "uploading": "アップロード中...",
+      "uploadSuccess": "画像は画像ホスティングにアップロードされました",
+      "saveSuccess": "画像はローカルに保存されました",
+      "uploadFailed": "画像の挿入に失敗しました",
+      "sizeSmall": "小 (25%)",
+      "sizeMedium": "中 (50%)",
+      "sizeLarge": "大 (75%)",
+      "sizeOriginal": "元のサイズ",
+      "editAlt": "代替テキストを編集",
+      "editSrc": "URLを編集",
+      "editSize": "サイズを設定",
+      "resetSize": "サイズをリセット",
+      "widthPlaceholder": "幅",
+      "heightPlaceholder": "高さ",
+      "altPlaceholder": "代替テキストを入力...",
+      "srcPlaceholder": "画像URLを入力...",
+      "delete": "画像を削除",
+      "reset": "リセット",
+      "confirm": "確認",
+      "cancel": "キャンセル",
+      "failed": "画像処理に失敗しました"
+    },
+    "mermaid": {
+      "rendering": "レンダリング中...",
+      "renderError": "レンダリングエラー",
+      "clickToEdit": "クリックしてソースを編集",
+      "clickToAdd": "クリックして диаграммаを追加",
+      "placeholder": "Mermaid диаграммаコードを入力...",
+      "preview": "プレビュー",
+      "done": "完了",
+      "diagramTypes": {
+        "flowchart": "フローチャート",
+        "sequence": "シーケンス",
+        "classDiagram": "クラス図",
+        "stateDiagram": "ステート図",
+        "er": "ER図",
+        "gantt": "ガントチャート",
+        "pie": "円グラフ",
+        "journey": "ジャーニー"
+      },
+      "templates": {
+        "flowchart": "graph TD\n    A[開始] --> B[処理]\n    B --> C[終了]",
+        "sequence": "sequenceDiagram\n    participant Alice\n    participant Bob\n    Alice->>Bob: こんにちは\n    Bob-->>Alice: 返信",
+        "classDiagram": "classDiagram\n    Animal <|-- Duck\n    Animal <|-- Fish\n    Animal : +int age\n    Animal : +String gender",
+        "stateDiagram": "stateDiagram-v2\n    [*] --> Active\n    Active --> [*]",
+        "er": "erDiagram\n    CUSTOMER ||--o{ ORDER : places\n    CUSTOMER ||--o{ DELIVERY-ADDRESS : uses",
+        "gantt": "gantt\n    title プロジェクト計画\n    dateFormat YYYY-MM-DD\n    section 第一フェーズ\n    タスク1 :a1, 2024-01-01, 30d\n    section 第二フェーズ\n    タスク2 :after a1, 20d",
+        "pie": "pie title リソース割り当て\n    \"CPU\" : 45\n    \"メモリ\" : 30\n    \"ストレージ\" : 25",
+        "journey": "journey\n    title 私の日常\n    section 午前\n    通勤 : 7:00, 5\n    仕事 : 9:00, 8"
+      }
+    },
+    "slashCommand": {
+      "groups": {
+        "ai": "AI",
+        "heading": "見出し",
+        "list": "リスト",
+        "block": "ブロック",
+        "align": "整列",
+        "embed": "埋め込み",
+        "math": "数式",
+        "chart": "図"
+      },
+      "items": {
+        "continue": "続ける",
+        "continueDesc": "AIが内容を続きます",
+        "generateSection": "章を生成",
+        "generateSectionDesc": "現在のノートから新しい章を生成",
+        "summarize": "要約",
+        "summarizeDesc": "現在のノートを要約",
+        "customInstruction": "カスタム指示",
+        "customInstructionDesc": "自分の指示を入力して AI に実行させる",
+        "heading1": "見出し1",
+        "heading1Desc": "大見出し",
+        "heading2": "見出し2",
+        "heading2Desc": "中見出し",
+        "heading3": "見出し3",
+        "heading3Desc": "小見出し",
+        "heading4": "見出し4",
+        "heading4Desc": "レベル4見出し",
+        "heading5": "見出し5",
+        "heading5Desc": "レベル5見出し",
+        "heading6": "見出し6",
+        "heading6Desc": "レベル6見出し",
+        "bulletList": "箇条書き",
+        "bulletListDesc": "シンプルな箇条書きリストを作成",
+        "orderedList": "番号付きリスト",
+        "orderedListDesc": "番号付きのリストを作成",
+        "taskList": "タスクリスト",
+        "taskListDesc": "チェックボックス付きタスクリストを作成",
+        "image": "画像",
+        "imageDesc": "ローカル画像または画像ホスティングを挿入",
+        "file": "ファイル",
+        "fileDesc": "ローカルファイルを選択してリンクを挿入",
+        "table": "表",
+        "tableDesc": "表を挿入",
+        "blockquote": "引用",
+        "blockquoteDesc": "引用内容をキャプチャ",
+        "codeBlock": "コードブロック",
+        "codeBlockDesc": "コードスニペットをキャプチャ",
+        "divider": "区切り線",
+        "dividerDesc": "要素の間に区切り線を作成",
+        "inlineMath": "インライン数式",
+        "inlineMathDesc": "インラインLaTeX数式を挿入",
+        "blockMath": "ブロック数式",
+        "blockMathDesc": "ブロックLaTeX数式を挿入",
+        "flowchart": "フローチャート",
+        "flowchartDesc": "フローチャートを挿入",
+        "sequence": "シーケンス図",
+        "sequenceDesc": "シーケンス図を挿入",
+        "gantt": "ガントチャート",
+        "ganttDesc": "ガントチャートを挿入",
+        "classDiagram": "クラス図",
+        "classDiagramDesc": "クラス図を挿入",
+        "stateDiagram": "状態図",
+        "stateDiagramDesc": "状態図を挿入",
+        "pie": "円グラフ",
+        "pieDesc": "円グラフを挿入",
+        "erDiagram": "ER図",
+        "erDiagramDesc": "エンティティ関係図を挿入",
+        "journey": "ジャーニーマップ",
+        "journeyDesc": "ユーザージャーニーマップを挿入"
+      },
+      "imageUpload": {
+        "success": "アップロード成功",
+        "saveSuccess": "保存成功",
+        "savePath": "保存先: {path}",
+        "failed": "画像の挿入に失敗しました"
+      },
+      "fileInsert": {
+        "failed": "ファイルリンクの挿入に失敗しました"
+      },
+      "customPrompt": {
+        "ariaLabel": "カスタム AI 指示",
+        "placeholder": "AI 指示を入力",
+        "submit": "実行"
+      }
+    }
+  },
+  "tabContext": {
+    "close": "閉じる",
+    "closeOthers": "その他を閉じる",
+    "closeAll": "すべて閉じる",
+    "closeLeft": "左を閉じる",
+    "closeRight": "右を閉じる"
   }
 }

@@ -50,7 +50,7 @@ const useImageStore = create<MarkState>((set, get) => ({
     if (mainImageHosting) {
       set({ mainImageHosting })
     }
-    
+
     // 初始化 S3 配置
     const s3Config = await store.get<S3Config>('s3Config');
     if (s3Config) {

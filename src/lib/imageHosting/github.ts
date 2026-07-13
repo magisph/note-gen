@@ -90,6 +90,13 @@ export async function uploadImageByGithub(file: File) {
   const store = await Store.load('store.json');
   const accessToken = await store.get('githubImageAccessToken')
   const username = await store.get('githubImageUsername')
+  const repoName = await getImageRepoName()
+
+  if (!accessToken || !username) {
+    console.error('[GitHub Image] Missing accessToken or username')
+    throw new Error('GitHub image hosting not configured: missing accessToken or username')
+  }
+
   const id = uuid()
 
   // 获取代理设置
@@ -101,9 +108,6 @@ export async function uploadImageByGithub(file: File) {
   try {
     const ext = file.type.split('/')[1]
     const filename = `${id}.${ext}`.replace(/\s/g, '_')
-    
-    // 获取实际使用的仓库名（自定义或默认）
-    const repoName = await getImageRepoName()
     
     // 设置请求头
     const headers = new Headers();
@@ -152,6 +156,7 @@ export async function uploadImageByGithub(file: File) {
       description: (error as GithubError).message,
       variant: 'destructive',
     })
+    throw error  // 抛出错误，让 handleImageUpload 知道上传失败
   }
 }
 

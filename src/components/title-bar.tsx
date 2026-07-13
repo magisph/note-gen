@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { platform } from '@tauri-apps/plugin-os'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { isMobileDevice } from '@/lib/check'
-import { Search, Settings, Minus, Square, X, PanelLeft, PanelRight, SquarePen, Cog } from 'lucide-react'
+import { Search, Settings, Minus, Square, X, PanelLeft, PanelRight, SquarePen, Cog, CalendarDays } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useSidebarStore } from '@/stores/sidebar'
@@ -17,13 +17,13 @@ import useSettingStore from '@/stores/setting'
 import useArticleStore from '@/stores/article'
 import useUpdateStore from '@/stores/update'
 import React from 'react'
-import { ControlText } from '@/app/core/record/mark/control-text'
-import { ControlRecording } from '@/app/core/record/mark/control-recording'
-import { ControlScan } from '@/app/core/record/mark/control-scan'
-import { ControlImage } from '@/app/core/record/mark/control-image'
-import { ControlLink } from '@/app/core/record/mark/control-link'
-import { ControlFile } from '@/app/core/record/mark/control-file'
-import { ControlTodo } from '@/app/core/record/mark/control-todo'
+import { ControlText } from '@/app/core/main/mark/control-text'
+import { ControlRecording } from '@/app/core/main/mark/control-recording'
+import { ControlScan } from '@/app/core/main/mark/control-scan'
+import { ControlImage } from '@/app/core/main/mark/control-image'
+import { ControlLink } from '@/app/core/main/mark/control-link'
+import { ControlFile } from '@/app/core/main/mark/control-file'
+import { ControlTodo } from '@/app/core/main/mark/control-todo'
 import {
   DndContext,
   closestCenter,
@@ -44,9 +44,11 @@ type Platform = 'macos' | 'windows' | 'linux' | 'unknown'
 
 interface TitleBarProps {
   onSearchClick?: () => void
+  onActivityClick?: () => void
+  activityOpen?: boolean
 }
 
-export function TitleBar({ onSearchClick }: TitleBarProps) {
+export function TitleBar({ onSearchClick, onActivityClick, activityOpen = false }: TitleBarProps) {
   const [currentPlatform, setCurrentPlatform] = useState<Platform>('unknown')
   const [isMobile, setIsMobile] = useState(true)
   const pathname = usePathname()
@@ -185,7 +187,7 @@ export function TitleBar({ onSearchClick }: TitleBarProps) {
         data-tauri-drag-region
       >
         {/* 左侧记录工具栏按钮 */}
-        <div className="flex items-center gap-0.5 px-2 shrink-0" data-tauri-drag-region="false">
+        <div id="onboarding-target-record-toolbar" className="flex items-center gap-0.5 px-2 shrink-0" data-tauri-drag-region="false">
           <TooltipProvider>
             <DndContext
               sensors={sensors}
@@ -318,6 +320,22 @@ export function TitleBar({ onSearchClick }: TitleBarProps) {
             </TooltipContent>
           </Tooltip>
           
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`h-8 w-8 ${activityOpen ? 'bg-primary/10 text-primary hover:bg-primary/15' : ''}`}
+                onClick={onActivityClick}
+              >
+                <CalendarDays className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>{t('navigation.activity')}</p>
+            </TooltipContent>
+          </Tooltip>
+
           <SyncToggle />
           
           <PinToggle />

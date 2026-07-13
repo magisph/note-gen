@@ -1,34 +1,67 @@
 import { Tool, ToolResult } from '../types'
 import { mkdir, remove, exists, readDir } from '@tauri-apps/plugin-fs'
-import { getWorkspacePath, getFilePathOptions } from '@/lib/workspace'
+import { ensureSafeWorkspaceRelativePath, getWorkspacePath, getFilePathOptions } from '@/lib/workspace'
 import { join } from '@tauri-apps/api/path'
 import useArticleStore from '@/stores/article'
+import { getVectorDocumentKey } from '@/lib/vector-document-key'
+
+async function getMarkdownFilesForFolder(folderPath: string): Promise<string[]> {
+  const { collectMarkdownFiles } = await import('@/lib/files')
+  const files = await collectMarkdownFiles(folderPath)
+  return files.map(file => file.path)
+}
+
+async function deleteVectorDocumentsForFiles(filePaths: string[]): Promise<void> {
+  const { deleteVectorDocumentsByFilename } = await import('@/db/vector')
+
+  for (const filePath of filePaths) {
+    const vectorKey = getVectorDocumentKey(filePath)
+    const legacyFilename = filePath.split('/').pop() || filePath
+
+    try {
+      await deleteVectorDocumentsByFilename(vectorKey)
+      if (legacyFilename !== vectorKey) {
+        await deleteVectorDocumentsByFilename(legacyFilename)
+      }
+    } catch (error) {
+      console.error(`删除文件 ${filePath} 的向量数据失败:`, error)
+    }
+  }
+
+  const articleState = useArticleStore.getState()
+  const nextMap = new Map(articleState.vectorIndexedFiles)
+  for (const filePath of filePaths) {
+    nextMap.delete(getVectorDocumentKey(filePath))
+  }
+  useArticleStore.setState({ vectorIndexedFiles: nextMap })
+}
 
 export const checkFolderExistsTool: Tool = {
   name: 'check_folder_exists',
-  description: '检查指定的文件夹是否存在',
+  description: 'Check if the specified folder exists',
   category: 'note',
   requiresConfirmation: false,
   parameters: [
     {
       name: 'folderPath',
       type: 'string',
-      description: '要检查的文件夹路径（相对于笔记根目录，例如："前端/React" 或 "学习笔记"）',
+      description: 'Folder path to check (relative to notes root directory, e.g., "frontend/React" or "study-notes")',
       required: true,
     },
   ],
   execute: async (params): Promise<ToolResult> => {
     try {
+      const normalizedFolderPath = await ensureSafeWorkspaceRelativePath(params.folderPath)
       const workspace = await getWorkspacePath()
 
       let fullPath = ''
       let folderExists = false
 
       if (workspace.isCustom) {
-        fullPath = await join(workspace.path, params.folderPath)
+        fullPath = await join(workspace.path, normalizedFolderPath)
         folderExists = await exists(fullPath)
       } else {
-        const { path, baseDir } = await getFilePathOptions(params.folderPath)
+        const { path, baseDir } = await getFilePathOptions(normalizedFolderPath)
         fullPath = path
         folderExists = await exists(fullPath, { baseDir })
       }
@@ -36,13 +69,13 @@ export const checkFolderExistsTool: Tool = {
       return {
         success: true,
         data: {
-          folderPath: params.folderPath,
+          folderPath: normalizedFolderPath,
           exists: folderExists,
           fullPath,
         },
         message: folderExists
-          ? `文件夹 "${params.folderPath}" 存在`
-          : `文件夹 "${params.folderPath}" 不存在`,
+          ? `文件夹 "${normalizedFolderPath}" 存在`
+          : `文件夹 "${normalizedFolderPath}" 不存在`,
       }
     } catch (error) {
       console.error('[check_folder_exists] 检查失败', {
@@ -60,14 +93,14 @@ export const checkFolderExistsTool: Tool = {
 
 export const createFolderTool: Tool = {
   name: 'create_folder',
-  description: '创建一个新的文件夹用于组织笔记',
+  description: 'Create a new folder for organizing notes',
   category: 'note',
   requiresConfirmation: false,
   parameters: [
     {
       name: 'folderPath',
       type: 'string',
-      description: '文件夹路径（相对于笔记根目录，例如："前端/React" 或 "学习笔记"）',
+      description: 'Folder path (relative to notes root directory, e.g., "frontend/React" or "study-notes")',
       required: true,
     },
   ],
@@ -81,11 +114,13 @@ export const createFolderTool: Tool = {
         }
       }
 
+      const normalizedFolderPath = await ensureSafeWorkspaceRelativePath(params.folderPath)
+
       const workspace = await getWorkspacePath()
 
       if (workspace.isCustom) {
         // 自定义工作区：使用绝对路径
-        const fullPath = await join(workspace.path, params.folderPath)
+        const fullPath = await join(workspace.path, normalizedFolderPath)
         
         // 检查文件夹是否已存在
         const folderExists = await exists(fullPath)
@@ -93,8 +128,8 @@ export const createFolderTool: Tool = {
           // 文件夹已存在，视为成功
           return {
             success: true,
-            data: { folderPath: params.folderPath, alreadyExists: true },
-            message: `文件夹已存在: ${params.folderPath}`,
+            data: { folderPath: normalizedFolderPath, alreadyExists: true },
+            message: `文件夹已存在: ${normalizedFolderPath}`,
           }
         }
 
@@ -102,7 +137,7 @@ export const createFolderTool: Tool = {
         await mkdir(fullPath, { recursive: true })
       } else {
         // 默认工作区：使用 baseDir
-        const { path, baseDir } = await getFilePathOptions(params.folderPath)
+        const { path, baseDir } = await getFilePathOptions(normalizedFolderPath)
         
         // 检查文件夹是否已存在
         const folderExists = await exists(path, { baseDir })
@@ -110,8 +145,8 @@ export const createFolderTool: Tool = {
           // 文件夹已存在，视为成功
           return {
             success: true,
-            data: { folderPath: params.folderPath, alreadyExists: true },
-            message: `文件夹已存在: ${params.folderPath}`,
+            data: { folderPath: normalizedFolderPath, alreadyExists: true },
+            message: `文件夹已存在: ${normalizedFolderPath}`,
           }
         }
 
@@ -119,14 +154,17 @@ export const createFolderTool: Tool = {
         await mkdir(path, { baseDir, recursive: true })
       }
 
-      // 刷新文件树
       const articleStore = useArticleStore.getState()
-      await articleStore.loadFileTree()
+      const inserted = articleStore.insertLocalEntry(normalizedFolderPath, true)
+      await articleStore.ensurePathExpanded(normalizedFolderPath)
+      if (!inserted) {
+        await articleStore.loadFileTree()
+      }
 
       return {
         success: true,
-        data: { folderPath: params.folderPath },
-        message: `成功创建文件夹: ${params.folderPath}`,
+        data: { folderPath: normalizedFolderPath },
+        message: `成功创建文件夹: ${normalizedFolderPath}`,
       }
     } catch (error) {
       return {
@@ -139,14 +177,14 @@ export const createFolderTool: Tool = {
 
 export const deleteFolderTool: Tool = {
   name: 'delete_folder',
-  description: '删除指定的文件夹（会删除文件夹内的所有内容）',
+  description: 'Delete the specified folder (will delete all contents within the folder)',
   category: 'note',
   requiresConfirmation: true,
   parameters: [
     {
       name: 'folderPath',
       type: 'string',
-      description: '要删除的文件夹路径',
+      description: 'Path of the folder to delete',
       required: true,
     },
   ],
@@ -160,18 +198,21 @@ export const deleteFolderTool: Tool = {
         }
       }
 
+      const normalizedFolderPath = await ensureSafeWorkspaceRelativePath(params.folderPath)
+      const filePathsInFolder = await getMarkdownFilesForFolder(normalizedFolderPath)
+
       const workspace = await getWorkspacePath()
 
       if (workspace.isCustom) {
         // 自定义工作区：使用绝对路径
-        const fullPath = await join(workspace.path, params.folderPath)
+        const fullPath = await join(workspace.path, normalizedFolderPath)
         
         // 检查文件夹是否存在
         const folderExists = await exists(fullPath)
         if (!folderExists) {
           return {
             success: false,
-            error: `文件夹不存在: ${params.folderPath}`,
+            error: `文件夹不存在: ${normalizedFolderPath}`,
           }
         }
 
@@ -179,14 +220,14 @@ export const deleteFolderTool: Tool = {
         await remove(fullPath, { recursive: true })
       } else {
         // 默认工作区：使用 baseDir
-        const { path, baseDir } = await getFilePathOptions(params.folderPath)
+        const { path, baseDir } = await getFilePathOptions(normalizedFolderPath)
         
         // 检查文件夹是否存在
         const folderExists = await exists(path, { baseDir })
         if (!folderExists) {
           return {
             success: false,
-            error: `文件夹不存在: ${params.folderPath}`,
+            error: `文件夹不存在: ${normalizedFolderPath}`,
           }
         }
 
@@ -194,13 +235,24 @@ export const deleteFolderTool: Tool = {
         await remove(path, { baseDir, recursive: true })
       }
 
-      // 刷新文件树
       const articleStore = useArticleStore.getState()
-      await articleStore.loadFileTree()
+      const removed = articleStore.removeLocalEntry(normalizedFolderPath)
+      if (!removed) {
+        await articleStore.loadFileTree()
+      }
+
+      await deleteVectorDocumentsForFiles(filePathsInFolder)
+
+      await articleStore.cleanTabsByDeletedFolder(normalizedFolderPath)
+
+      if (articleStore.activeFilePath && articleStore.activeFilePath.startsWith(`${normalizedFolderPath}/`)) {
+        await articleStore.setActiveFilePath('')
+        articleStore.setCurrentArticle('')
+      }
 
       return {
         success: true,
-        message: `成功删除文件夹: ${params.folderPath}`,
+        message: `成功删除文件夹: ${normalizedFolderPath}`,
       }
     } catch (error) {
       return {
@@ -213,14 +265,14 @@ export const deleteFolderTool: Tool = {
 
 export const listFoldersTool: Tool = {
   name: 'list_folders',
-  description: '列出指定路径下的所有文件夹',
+  description: 'List all folders under the specified path',
   category: 'note',
   requiresConfirmation: false,
   parameters: [
     {
       name: 'folderPath',
       type: 'string',
-      description: '要列出的文件夹路径，留空表示根目录',
+      description: 'Folder path to list, leave empty for root directory',
       required: false,
     },
   ],
@@ -228,10 +280,14 @@ export const listFoldersTool: Tool = {
     try {
       const workspace = await getWorkspacePath()
 
+      const normalizedFolderPath = params.folderPath
+        ? await ensureSafeWorkspaceRelativePath(params.folderPath)
+        : ''
+
       if (workspace.isCustom) {
         // 自定义工作区：使用绝对路径
-        const fullPath = params.folderPath
-          ? await join(workspace.path, params.folderPath)
+        const fullPath = normalizedFolderPath
+          ? await join(workspace.path, normalizedFolderPath)
           : workspace.path
 
         // 检查路径是否存在
@@ -240,7 +296,7 @@ export const listFoldersTool: Tool = {
         if (!pathExists) {
           return {
             success: false,
-            error: `路径不存在: ${params.folderPath || '根目录'}`,
+            error: `路径不存在: ${normalizedFolderPath || '根目录'}`,
           }
         }
 
@@ -252,7 +308,7 @@ export const listFoldersTool: Tool = {
           .filter(entry => entry.isDirectory)
           .map(entry => ({
             name: entry.name,
-            path: params.folderPath ? `${params.folderPath}/${entry.name}` : entry.name,
+            path: normalizedFolderPath ? `${normalizedFolderPath}/${entry.name}` : entry.name,
           }))
 
         return {
@@ -262,7 +318,7 @@ export const listFoldersTool: Tool = {
         }
       } else {
         // 默认工作区：使用 baseDir
-        const { path, baseDir } = await getFilePathOptions(params.folderPath || '')
+        const { path, baseDir } = await getFilePathOptions(normalizedFolderPath)
 
         // 检查路径是否存在
         const pathExists = await exists(path, { baseDir })
@@ -270,7 +326,7 @@ export const listFoldersTool: Tool = {
         if (!pathExists) {
           return {
             success: false,
-            error: `路径不存在: ${params.folderPath || '根目录'}`,
+            error: `路径不存在: ${normalizedFolderPath || '根目录'}`,
           }
         }
 
@@ -282,7 +338,7 @@ export const listFoldersTool: Tool = {
           .filter(entry => entry.isDirectory)
           .map(entry => ({
             name: entry.name,
-            path: params.folderPath ? `${params.folderPath}/${entry.name}` : entry.name,
+            path: normalizedFolderPath ? `${normalizedFolderPath}/${entry.name}` : entry.name,
           }))
 
         return {
@@ -306,14 +362,14 @@ export const listFoldersTool: Tool = {
 
 export const createFoldersBatchTool: Tool = {
   name: 'create_folders_batch',
-  description: '批量创建多个文件夹，避免循环调用。适用于需要一次性创建多个文件夹的场景。',
+  description: 'Batch create multiple folders to avoid loop calls. Use for scenarios requiring multiple folders to be created at once.',
   category: 'note',
   requiresConfirmation: false,
   parameters: [
     {
       name: 'folderPaths',
       type: 'array',
-      description: '要创建的文件夹路径数组',
+      description: 'Array of folder paths to create',
       required: true,
     },
   ],
@@ -333,24 +389,26 @@ export const createFoldersBatchTool: Tool = {
 
       for (const folderPath of params.folderPaths) {
         try {
+          const normalizedFolderPath = await ensureSafeWorkspaceRelativePath(folderPath)
+
           if (workspace.isCustom) {
-            const fullPath = await join(workspace.path, folderPath)
+            const fullPath = await join(workspace.path, normalizedFolderPath)
             const folderExists = await exists(fullPath)
             if (folderExists) {
-              skipped.push({ path: folderPath, reason: '文件夹已存在' })
+              skipped.push({ path: normalizedFolderPath, reason: '文件夹已存在' })
               continue
             }
             await mkdir(fullPath, { recursive: true })
           } else {
-            const { path, baseDir } = await getFilePathOptions(folderPath)
+            const { path, baseDir } = await getFilePathOptions(normalizedFolderPath)
             const folderExists = await exists(path, { baseDir })
             if (folderExists) {
-              skipped.push({ path: folderPath, reason: '文件夹已存在' })
+              skipped.push({ path: normalizedFolderPath, reason: '文件夹已存在' })
               continue
             }
             await mkdir(path, { baseDir, recursive: true })
           }
-          created.push(folderPath)
+          created.push(normalizedFolderPath)
         } catch (error) {
           errors.push({ path: folderPath, error: String(error) })
         }
@@ -359,11 +417,9 @@ export const createFoldersBatchTool: Tool = {
       const articleStore = useArticleStore.getState()
       await articleStore.loadFileTree()
 
-      // 只要有创建或跳过的，就算成功
-      const success = created.length > 0 || skipped.length > 0
-
+      // 只要有任何真正错误，就标记为失败状态（已存在的 skipped 不算错误）
       return {
-        success,
+        success: errors.length === 0,
         data: {
           created,
           skipped,
@@ -372,7 +428,9 @@ export const createFoldersBatchTool: Tool = {
           skippedCount: skipped.length,
           errorCount: errors.length,
         },
-        message: `创建 ${created.length} 个，跳过 ${skipped.length} 个${errors.length > 0 ? `，${errors.length} 个失败` : ''}`,
+        message: errors.length === 0
+          ? `创建 ${created.length} 个，跳过 ${skipped.length} 个`
+          : `部分失败：创建 ${created.length} 个，跳过 ${skipped.length} 个，${errors.length} 个失败`,
       }
     } catch (error) {
       return {
@@ -385,14 +443,14 @@ export const createFoldersBatchTool: Tool = {
 
 export const deleteFoldersBatchTool: Tool = {
   name: 'delete_folders_batch',
-  description: '批量删除多个文件夹（会删除文件夹内的所有内容），避免循环调用。',
+  description: 'Batch delete multiple folders (will delete all contents within the folders) to avoid loop calls.',
   category: 'note',
   requiresConfirmation: true,
   parameters: [
     {
       name: 'folderPaths',
       type: 'array',
-      description: '要删除的文件夹路径数组',
+      description: 'Array of folder paths to delete',
       required: true,
     },
   ],
@@ -406,46 +464,63 @@ export const deleteFoldersBatchTool: Tool = {
       }
 
       const workspace = await getWorkspacePath()
+      const articleStore = useArticleStore.getState()
       const results = []
       const errors = []
+      const filePathsByFolder = new Map<string, string[]>()
 
       for (const folderPath of params.folderPaths) {
         try {
+          const normalizedFolderPath = await ensureSafeWorkspaceRelativePath(folderPath)
+          filePathsByFolder.set(normalizedFolderPath, await getMarkdownFilesForFolder(normalizedFolderPath))
+
           if (workspace.isCustom) {
-            const fullPath = await join(workspace.path, folderPath)
+            const fullPath = await join(workspace.path, normalizedFolderPath)
             const folderExists = await exists(fullPath)
             if (!folderExists) {
-              errors.push({ path: folderPath, error: '文件夹不存在' })
+              errors.push({ path: normalizedFolderPath, error: '文件夹不存在' })
               continue
             }
             await remove(fullPath, { recursive: true })
           } else {
-            const { path, baseDir } = await getFilePathOptions(folderPath)
+            const { path, baseDir } = await getFilePathOptions(normalizedFolderPath)
             const folderExists = await exists(path, { baseDir })
             if (!folderExists) {
-              errors.push({ path: folderPath, error: '文件夹不存在' })
+              errors.push({ path: normalizedFolderPath, error: '文件夹不存在' })
               continue
             }
             await remove(path, { baseDir, recursive: true })
           }
-          results.push(folderPath)
+          results.push(normalizedFolderPath)
         } catch (error) {
           errors.push({ path: folderPath, error: String(error) })
         }
       }
 
-      const articleStore = useArticleStore.getState()
+      for (const deletedFolderPath of results) {
+        await deleteVectorDocumentsForFiles(filePathsByFolder.get(deletedFolderPath) || [])
+        await articleStore.cleanTabsByDeletedFolder(deletedFolderPath)
+
+        if (articleStore.activeFilePath && articleStore.activeFilePath.startsWith(`${deletedFolderPath}/`)) {
+          await articleStore.setActiveFilePath('')
+          articleStore.setCurrentArticle('')
+        }
+      }
+
       await articleStore.loadFileTree()
 
+      // 只要有任何文件夹删除失败，就标记为失败状态
       return {
-        success: results.length > 0,
-        data: { 
-          deleted: results, 
+        success: errors.length === 0,
+        data: {
+          deleted: results,
           failed: errors,
           successCount: results.length,
           failCount: errors.length,
         },
-        message: `成功删除 ${results.length} 个文件夹${errors.length > 0 ? `，${errors.length} 个失败` : ''}`,
+        message: errors.length === 0
+          ? `成功删除 ${results.length} 个文件夹`
+          : `部分失败：成功删除 ${results.length} 个文件夹，${errors.length} 个失败`,
       }
     } catch (error) {
       return {

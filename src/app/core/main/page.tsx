@@ -2,8 +2,8 @@
 
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import { LeftSidebar } from "./left-sidebar"
-import { EditorWrapper } from '../article/editor-wrapper'
-import Chat from '../record/chat'
+import { EditorLayout } from './editor/editor-layout'
+import Chat from './chat'
 import dynamic from 'next/dynamic'
 import { useSidebarStore } from "@/stores/sidebar"
 import { useEffect, useState, useRef } from 'react'
@@ -63,7 +63,7 @@ function ResizableWrapper() {
   const centerPanelRef = useRef<ImperativePanelHandle>(null)
   const rightPanelRef = useRef<ImperativePanelHandle>(null)
   
-  const MIN_SIDEBAR_WIDTH_PX = 360
+  const MIN_SIDEBAR_WIDTH_PX = 280
   const MIN_EDITOR_WIDTH_PX = 400
   const [minSidebarSize, setMinSidebarSize] = useState(20)
   const [minEditorSize, setMinEditorSize] = useState(30)
@@ -189,7 +189,7 @@ function ResizableWrapper() {
         collapsible={true}
         collapsedSize={0}
       >
-        <EditorWrapper />
+        <EditorLayout />
       </ResizablePanel>
     )
 
@@ -240,7 +240,7 @@ function Page() {
     }
     saveCurrentPage()
   }, [])
-  
+
   return <ResizableWrapper />
 }
 

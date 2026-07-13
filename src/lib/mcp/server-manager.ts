@@ -1,4 +1,5 @@
 import { MCPClient } from './client'
+import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { useMcpStore } from '@/stores/mcp'
 import type {
   MCPServerConfig,
@@ -6,6 +7,24 @@ import type {
   MCPResource,
   CallToolResult,
 } from './types'
+
+interface MCPBatchTestResult {
+  total: number
+  success: number
+  failed: number
+  results: Array<{
+    serverId: string
+    success: boolean
+  }>
+}
+
+function sanitizeMcpError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error)
+
+  return message
+    .replace(/([?&][^=&\s]*(?:key|token|secret|password)=)[^&\s)]+/gi, '$1[REDACTED]')
+    .replace(/(bearer\s+)[\w.-]+/gi, '$1[REDACTED]')
+}
 
 /**
  * MCP 服务器管理器
@@ -29,6 +48,10 @@ export class MCPServerManager {
    */
   async connectServer(config: MCPServerConfig): Promise<void> {
     const store = useMcpStore.getState()
+
+    if (this.clients.has(config.id)) {
+      await this.disconnectServer(config.id)
+    }
     
     // 设置连接中状态
     store.setServerState(config.id, {
@@ -67,19 +90,18 @@ export class MCPServerManager {
       
       // 更新最后连接时间
       store.updateServer(config.id, { lastConnected: Date.now() })
-      
-      // 连接成功
     } catch (error) {
+      const sanitizedError = sanitizeMcpError(error)
       // 静默处理错误，设置错误状态
       store.setServerState(config.id, {
         id: config.id,
         status: 'error',
         tools: [],
         resources: [],
-        error: error instanceof Error ? error.message : String(error),
+        error: sanitizedError,
       })
       
-      throw error
+      throw new Error(sanitizedError)
     }
   }
   
@@ -108,6 +130,20 @@ export class MCPServerManager {
   async reconnectServer(config: MCPServerConfig): Promise<void> {
     await this.disconnectServer(config.id)
     await this.connectServer(config)
+  }
+
+  async connectEnabledServers(servers: MCPServerConfig[]): Promise<void> {
+    for (const server of servers) {
+      if (!server.enabled) {
+        continue
+      }
+
+      try {
+        await this.connectServer(server)
+      } catch (error) {
+        console.error(`Failed to connect MCP server ${server.name}:`, sanitizeMcpError(error))
+      }
+    }
   }
   
   /**
@@ -198,7 +234,7 @@ export class MCPServerManager {
         }
         
         // 发送一个简单的 OPTIONS 请求来测试连接
-        await fetch(config.url, {
+        await tauriFetch(config.url, {
           method: 'OPTIONS',
           headers: {
             'Accept': 'application/json, text/event-stream',
@@ -209,7 +245,11 @@ export class MCPServerManager {
         return true
       } else {
         // 对于 stdio 服务器，需要实际启动和初始化
-        const client = new MCPClient(config)
+        const testConfig: MCPServerConfig = {
+          ...config,
+          id: `mcp-test-${config.id}-${Date.now()}`,
+        }
+        const client = new MCPClient(testConfig)
         try {
           await client.connect()
           await client.initialize()
@@ -230,6 +270,24 @@ export class MCPServerManager {
     } catch {
       // 静默处理测试失败
       return false
+    }
+  }
+
+  async testConnections(configs: MCPServerConfig[]): Promise<MCPBatchTestResult> {
+    const results = await Promise.all(
+      configs.map(async (config) => ({
+        serverId: config.id,
+        success: await this.testConnection(config),
+      }))
+    )
+
+    const success = results.filter(result => result.success).length
+
+    return {
+      total: results.length,
+      success,
+      failed: results.length - success,
+      results,
     }
   }
 }

@@ -2,7 +2,10 @@
 
 import { ThemeProvider } from "@/components/theme-provider"
 import useSettingStore from "@/stores/setting"
-import { useEffect } from "react";
+import { useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
+import { applyThemeColors } from "@/lib/theme-utils"
+import { applyAppFontFamily } from "@/lib/font-settings"
 import { initAllDatabases } from "@/db"
 import dayjs from "dayjs"
 import zh from "dayjs/locale/zh-cn";
@@ -18,34 +21,77 @@ import { reportAppStart } from "@/lib/event-report"
 import { MobileStatusBar } from "@/components/mobile-statusbar"
 import { TextSizeProvider } from "@/contexts/text-size-context"
 import { SyncConfirmDialog } from "@/components/sync-confirm-dialog"
-import { ControlText } from "@/app/core/record/mark/control-text"
-import { ControlRecording } from "@/app/core/record/mark/control-recording"
-import { ControlImage } from "@/app/core/record/mark/control-image"
-import { ControlLink } from "@/app/core/record/mark/control-link"
-import { ControlFile } from "@/app/core/record/mark/control-file"
+import { AutoDataSyncConflictDialog } from "@/components/auto-data-sync-conflict-dialog"
+import { MobileViewport } from "@/components/mobile-viewport"
+import { ControlText } from "@/app/core/main/mark/control-text"
+import { ControlRecording } from "@/app/core/main/mark/control-recording"
+import { ControlImage } from "@/app/core/main/mark/control-image"
+import { ControlLink } from "@/app/core/main/mark/control-link"
+import { ControlFile } from "@/app/core/main/mark/control-file"
+import { ControlTodo } from "@/app/core/main/mark/control-todo"
+import { initAutoDataSyncRuntime } from "@/lib/sync/auto-data-sync-queue"
+import useArticleStore from "@/stores/article"
+import { WritingScreen } from "./writing/writing-screen"
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { initSettingData } = useSettingStore()
+  const pathname = usePathname()
+  const isWritingRoute = pathname === '/mobile/writing'
+  const [hasWritingCache, setHasWritingCache] = useState(isWritingRoute)
+  const { initSettingData, customThemeColors, appFontFamily } = useSettingStore()
   const { initMainHosting } = useImageStore()
+  const { initCollapsibleList } = useArticleStore()
+  const { initVectorDb } = useVectorStore()
   const { currentLocale } = useI18n()
   useEffect(() => {
-    initSettingData()
-    initMainHosting()
-    initAllDatabases()
-    initMcp()
-    // 上报应用启动事件
-    reportAppStart()
-  }, [])
+    if (isWritingRoute) {
+      setHasWritingCache(true)
+    }
+  }, [isWritingRoute])
 
-  const { initVectorDb } = useVectorStore()
-  
-  // 初始化向量数据库
   useEffect(() => {
-    initVectorDb()
+    if (isWritingRoute) {
+      return
+    }
+
+    const writingRoot = document.getElementById('mobile-writing')
+    const activeElement = document.activeElement
+    if (writingRoot && activeElement instanceof HTMLElement && writingRoot.contains(activeElement)) {
+      activeElement.blur()
+    }
+  }, [isWritingRoute])
+
+  useEffect(() => {
+    let cancelled = false
+
+    void reportAppStart()
+
+    const initializeApp = async () => {
+      try {
+        await initSettingData()
+        initMainHosting()
+        await initAllDatabases()
+        if (cancelled) return
+        await initCollapsibleList()
+        if (cancelled) return
+        await initAutoDataSyncRuntime()
+        if (cancelled) return
+        await initVectorDb()
+        if (cancelled) return
+        initMcp()
+      } catch (error) {
+        console.error('Failed to initialize mobile app:', error)
+      }
+    }
+
+    void initializeApp()
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   useEffect(() => {
@@ -61,6 +107,18 @@ export default function RootLayout({
     }
   }, [currentLocale])
 
+  // 应用自定义主题颜色
+  useEffect(() => {
+    applyThemeColors(customThemeColors)
+  }, [customThemeColors])
+
+  // 应用字体
+  useEffect(() => {
+    applyAppFontFamily(appFontFamily)
+  }, [appFontFamily])
+
+  const hideFootbar = pathname.startsWith('/mobile/setting/pages') || pathname === '/mobile/record/detail'
+
   return (
     <ThemeProvider
       attribute="class"
@@ -69,13 +127,26 @@ export default function RootLayout({
       disableTransitionOnChange
     >
       <TextSizeProvider>
+        <MobileViewport />
         <MobileStatusBar />
         <TooltipProvider>
-          <div className="flex flex-col h-full">
-            <main className="flex flex-1 w-full overflow-hidden">
-              {children}
+          <div className="mobile-app-shell flex flex-col">
+            <main className="mobile-app-main flex flex-1 w-full overflow-hidden">
+              {hasWritingCache ? (
+                <div
+                  className={isWritingRoute ? "h-full w-full min-w-0" : "hidden"}
+                  aria-hidden={!isWritingRoute}
+                >
+                  <WritingScreen />
+                </div>
+              ) : null}
+              {!isWritingRoute ? children : null}
             </main>
-            <AppFootbar />
+            {!hideFootbar ? (
+              <div className="mobile-footbar">
+                <AppFootbar />
+              </div>
+            ) : null}
           </div>
           {/* 隐藏的记录工具组件，用于监听事件 */}
           <div className="absolute opacity-0 pointer-events-none -z-50">
@@ -84,9 +155,11 @@ export default function RootLayout({
             <ControlImage />
             <ControlLink />
             <ControlFile />
+            <ControlTodo />
           </div>
         </TooltipProvider>
         <SyncConfirmDialog />
+        <AutoDataSyncConflictDialog />
       </TextSizeProvider>
     </ThemeProvider>
   );

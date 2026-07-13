@@ -5,11 +5,14 @@ interface RecordingState {
   isRecording: boolean
   isPaused: boolean
   recordingDuration: number // 录音时长（秒）
-  
+
   // 录音数据
   audioChunks: Blob[]
   mediaRecorder: MediaRecorder | null
-  
+
+  // 计时器
+  timerId?: NodeJS.Timeout
+
   // 控制方法
   startRecording: () => Promise<void>
   pauseRecording: () => void
@@ -33,6 +36,10 @@ const useRecordingStore = create<RecordingState>((set, get) => ({
 
   startRecording: async () => {
     try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('当前环境不支持麦克风录音，请检查 Android WebView 或应用权限配置')
+      }
+
       // 请求麦克风权限
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       
@@ -64,30 +71,28 @@ const useRecordingStore = create<RecordingState>((set, get) => ({
         }
       }
       
-      mediaRecorder.onstop = () => {
-        // 停止所有音频轨道
-        stream.getTracks().forEach(track => track.stop())
-      }
-      
       mediaRecorder.start()
       
-      set({
-        isRecording: true,
-        isPaused: false,
-        audioChunks: chunks,
-        mediaRecorder,
-        recordingDuration: 0
-      })
-      
-      // 启动计时器
+      // 启动计时器，保存到 state
       const timerId = setInterval(() => {
         const state = get()
         if (state.isRecording && !state.isPaused) {
           set({ recordingDuration: state.recordingDuration + 1 })
         } else {
-          clearInterval(timerId)
+          // 暂停时清除计时器
+          clearInterval(state.timerId)
+          set({ timerId: undefined })
         }
       }, 1000)
+
+      set({
+        isRecording: true,
+        isPaused: false,
+        audioChunks: chunks,
+        mediaRecorder,
+        recordingDuration: 0,
+        timerId
+      })
       
     } catch (error) {
       console.error('启动录音失败:', error)
@@ -108,10 +113,14 @@ const useRecordingStore = create<RecordingState>((set, get) => ({
   },
 
   pauseRecording: () => {
-    const { mediaRecorder } = get()
+    const { mediaRecorder, timerId } = get()
     if (mediaRecorder && mediaRecorder.state === 'recording') {
       mediaRecorder.pause()
-      set({ isPaused: true })
+      // 暂停时清除计时器
+      if (timerId) {
+        clearInterval(timerId)
+      }
+      set({ isPaused: true, timerId: undefined })
     }
   },
 
@@ -124,15 +133,21 @@ const useRecordingStore = create<RecordingState>((set, get) => ({
   },
 
   stopRecording: async (): Promise<Blob | null> => {
-    const { mediaRecorder, audioChunks } = get()
-    
+    const { mediaRecorder, audioChunks, timerId } = get()
+
+    // 停止时清除计时器
+    if (timerId) {
+      clearInterval(timerId)
+    }
+
     if (!mediaRecorder) {
       return null
     }
     
     return new Promise((resolve) => {
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' })
+        const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || audioChunks[0]?.type || 'audio/webm' })
+        mediaRecorder.stream.getTracks().forEach(track => track.stop())
         get().resetState()
         resolve(audioBlob)
       }
@@ -152,12 +167,18 @@ const useRecordingStore = create<RecordingState>((set, get) => ({
   },
 
   resetState: () => {
+    const { timerId } = get()
+    // 重置时清除计时器
+    if (timerId) {
+      clearInterval(timerId)
+    }
     set({
       isRecording: false,
       isPaused: false,
       recordingDuration: 0,
       audioChunks: [],
-      mediaRecorder: null
+      mediaRecorder: null,
+      timerId: undefined
     })
   }
 }))

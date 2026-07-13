@@ -31,9 +31,17 @@ interface GroupedModel {
   model: ModelConfig
 }
 
-export function ModelSelect({modelKey}: {modelKey: string}) {
+export function ModelSelect({
+  modelKey,
+  emptyLabel,
+  clearTooltip,
+}: {
+  modelKey: string
+  emptyLabel?: string
+  clearTooltip?: string
+}) {
   const [groupedModels, setGroupedModels] = useState<GroupedModel[]>([])
-  const { setCompletionModel, setMarkDescModel, setPrimaryModel, setImageMethodModel, setAudioModel, setSttModel, setEmbeddingModel, setRerankingModel } = useSettingStore()
+  const { setCompletionModel, setMarkDescModel, setPrimaryModel, setImageMethodModel, setAudioModel, setSttModel, setEmbeddingModel, setRerankingModel, setCondenseModel, setInspirationModel } = useSettingStore()
   const [model, setModel] = useState<string>('')
   const [open, setOpen] = React.useState(false)
   const t = useTranslations('settings.defaultModel')
@@ -58,6 +66,10 @@ export function ModelSelect({modelKey}: {modelKey: string}) {
         return 'embeddingModel'
       case 'reranking':
         return 'rerankingModel'
+      case 'condense':
+        return 'condenseModel'
+      case 'inspiration':
+        return 'inspirationModel'
       default:
         return `${modelKey}Model`
     }
@@ -90,6 +102,12 @@ export function ModelSelect({modelKey}: {modelKey: string}) {
         break;
       case 'reranking':
         setRerankingModel(primaryModel)
+        break;
+      case 'condense':
+        setCondenseModel(primaryModel)
+        break;
+      case 'inspiration':
+        setInspirationModel(primaryModel)
         break;
       default:
         break;
@@ -182,20 +200,10 @@ export function ModelSelect({modelKey}: {modelKey: string}) {
   }
 
   // 检查模型是否被选中（支持向后兼容）
-  const isModelSelected = (modelId: string): boolean => {
+  const isModelSelected = (item: GroupedModel): boolean => {
     if (!model) return false
     
-    // 首先尝试精确匹配（新格式的组合键）
-    if (model === modelId) return true
-    
-    // 向后兼容匹配（旧格式的单独ID）
-    if (modelId.includes('-')) {
-      const parts = modelId.split('-')
-      const originalId = parts.slice(2).join('-') // 去掉 config.key 部分
-      return originalId === model
-    }
-    
-    return false
+    return model === item.model.id || model === `${item.configKey}-${item.model.id}`
   }
 
   // 查找当前选中的模型显示信息
@@ -203,20 +211,7 @@ export function ModelSelect({modelKey}: {modelKey: string}) {
     if (!model || !groupedModels.length) return null
     
     // 首先尝试精确匹配（新格式的组合键）
-    let selectedItem = groupedModels.find(item => item.model.id === model)
-    
-    // 如果没找到，尝试向后兼容匹配（旧格式的单独ID）
-    if (!selectedItem) {
-      selectedItem = groupedModels.find(item => {
-        // 对于新格式的组合键，提取原始ID进行匹配
-        if (item.model.id.includes('-')) {
-          const parts = item.model.id.split('-')
-          const originalId = parts.slice(2).join('-') // 去掉 config.key 部分
-          return originalId === model
-        }
-        return item.model.id === model
-      })
-    }
+    const selectedItem = groupedModels.find(isModelSelected)
     
     if (selectedItem) {
       return `${selectedItem.model.model}(${selectedItem.configTitle})`
@@ -250,8 +245,8 @@ export function ModelSelect({modelKey}: {modelKey: string}) {
               className="w-[280px] justify-between"
             >
               {model
-                ? findSelectedModelDisplay()
-                : modelKey === 'primaryModel' ? t('noModel') : t('tooltip')}
+                ? findSelectedModelDisplay() || model
+                : emptyLabel || (modelKey === 'primaryModel' ? t('noModel') : t('tooltip'))}
               <ChevronsUpDown className="opacity-50" />
             </Button>
           </div>
@@ -261,7 +256,7 @@ export function ModelSelect({modelKey}: {modelKey: string}) {
           icon={<X className="h-4 w-4" />}
           onClick={resetDefaultModel}
           variant="default"
-          tooltipText={t('tooltip')}
+          tooltipText={clearTooltip || t('tooltip')}
         />
       </div>
       <PopoverContent align="end" className="p-0">
@@ -284,7 +279,7 @@ export function ModelSelect({modelKey}: {modelKey: string}) {
                     <Check
                       className={cn(
                         "ml-auto",
-                        isModelSelected(item.model.id) ? "opacity-100" : "opacity-0"
+                        isModelSelected(item) ? "opacity-100" : "opacity-0"
                       )}
                     />
                   </CommandItem>

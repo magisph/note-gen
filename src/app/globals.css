@@ -85,6 +85,30 @@
   to {
     background-position: 0% 0%;}}}
 
+@keyframes recordSearchBreathe {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.45);
+    background-color: rgba(254, 243, 199, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.18);
+    border-color: rgba(245, 158, 11, 0.9);
+    background-color: rgba(254, 243, 199, 0.9);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.35);
+    background-color: rgba(254, 243, 199, 0.35);
+  }
+}
+
+.record-search-highlight {
+  animation: recordSearchBreathe 1.5s ease-in-out 2;
+}
+
 /* 基础样式 - 包含主题变量定义 */
 @layer base {
   :root {
@@ -174,6 +198,7 @@
     --component-active-bg: var(--secondary);
     --component-line-inactive-color: var(--muted-foreground);
     --component-active-color-default: var(--accent-foreground);
+    --notegen-app-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC", "WenQuanYi Micro Hei", Arial, sans-serif;
   }
 
   * {
@@ -183,6 +208,7 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    font-family: var(--notegen-app-font-family);
   }
 }
 
@@ -200,14 +226,17 @@ html, body {
   font-size: 0.875rem;
   cursor: pointer;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
-.file-manange-item:hover {
-  background-color: hsl(var(--third));
+.file-manange-item:not(.active):not(.file-selected):not(.file-on-drop):hover {
+  background-color: hsl(var(--third) / 0.55);
 }
 
-.dark .file-manange-item:hover {
-  background-color: hsl(var(--muted));
+.dark .file-manange-item:not(.active):not(.file-selected):not(.file-on-drop):hover {
+  background-color: hsl(var(--muted) / 0.65);
 }
 
 .file-manange-item.active {
@@ -227,6 +256,24 @@ html, body {
 
 .dark .file-manange-item.active .bg-primary-foreground {
   background-color: hsl(var(--secondary-foreground));
+}
+
+.file-manange-item.file-selected {
+  background-color: hsl(var(--primary) / 0.12);
+  color: hsl(var(--foreground));
+  box-shadow: inset 2px 0 0 hsl(var(--primary));
+}
+
+.dark .file-manange-item.file-selected {
+  background-color: hsl(var(--primary) / 0.18);
+  color: hsl(var(--foreground));
+  box-shadow: inset 2px 0 0 hsl(var(--primary));
+}
+
+.file-manange-item.file-on-drop {
+  background-color: hsl(var(--primary) / 0.12);
+  outline: 1px dashed hsl(var(--primary) / 0.7);
+  outline-offset: -2px;
 }
 
 :not(table)::-webkit-scrollbar {
@@ -306,6 +353,45 @@ ol {
   display: none;
 }
 
+/* Tab scrollbar - absolute positioned, doesn't take height */
+.tab-scrollbar {
+  position: relative;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tab-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom scrollbar using pseudo element */
+.tab-scrollbar-wrapper {
+  position: relative;
+}
+
+.tab-scrollbar-track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.tab-scrollbar-wrapper:hover .tab-scrollbar-track {
+  opacity: 1;
+}
+
+.tab-scrollbar-thumb {
+  position: absolute;
+  height: 100%;
+  background: hsl(var(--muted-foreground) / 0.4);
+  border-radius: 2px;
+  min-width: 20px;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -313,5 +399,59 @@ ol {
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--notegen-app-font-family);
+  }
+}
+
+/* Tiptap 搜索替换高亮样式 */
+.search-result {
+  background-color: #ffeb3b !important;
+  color: #000 !important;
+  padding: 0 2px !important;
+  border-radius: 2px !important;
+  text-decoration: none !important;
+}
+
+.search-result.search-result-current,
+.search-result.is-current {
+  background-color: #ff9800 !important;
+  color: #fff !important;
+}
+
+/* 暗色模式适配 */
+.dark .search-result {
+  background-color: #f59e0b !important;
+  color: #000 !important;
+}
+
+.dark .search-result.search-result-current,
+.dark .search-result.is-current {
+  background-color: #ea580c !important;
+  color: #fff !important;
+}
+
+/* Photo preview should leave breathing room around large images. */
+.PhotoView-Portal.notegen-photo-preview .PhotoView-Slider__BannerWrap {
+  display: none;
+}
+
+.PhotoView-Portal.notegen-photo-preview .PhotoView-Slider__Overlay {
+  pointer-events: none;
+  position: relative;
+  z-index: 30;
+}
+
+.PhotoView-Portal.notegen-photo-preview .notegen-photo-preview-control {
+  pointer-events: auto;
+}
+
+.PhotoView-Portal.notegen-photo-preview .notegen-photo-preview-photo {
+  scale: 0.9;
+  transform-origin: center;
+}
+
+@media (max-width: 640px) {
+  .PhotoView-Portal.notegen-photo-preview .notegen-photo-preview-photo {
+    scale: 0.88;
   }
 }

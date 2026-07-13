@@ -13,10 +13,11 @@ export interface SidebarState {
   toggleLeftSidebar: () => Promise<void>
   centerPanelVisible: boolean
   toggleCenterPanel: () => Promise<void>
+  showCenterPanel: () => Promise<void>
   rightSidebarVisible: boolean
   toggleRightSidebar: () => Promise<void>
-  leftSidebarTab: 'files' | 'notes' | 'outline'
-  setLeftSidebarTab: (tab: 'files' | 'notes' | 'outline') => Promise<void>
+  leftSidebarTab: 'files' | 'notes'
+  setLeftSidebarTab: (tab: 'files' | 'notes') => Promise<void>
   initSidebarState: () => Promise<void>
 }
 
@@ -86,6 +87,17 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
     await store.save()
   },
   centerPanelVisible: initialState.center,
+  showCenterPanel: async () => {
+    if (get().centerPanelVisible) {
+      return
+    }
+
+    set({ centerPanelVisible: true })
+    localStorage.setItem('centerPanelVisible', 'true')
+    const store = await Store.load('store.json')
+    await store.set('centerPanelVisible', true)
+    await store.save()
+  },
   toggleCenterPanel: async () => {
     const { leftSidebarVisible, centerPanelVisible, rightSidebarVisible } = get()
     
@@ -136,7 +148,7 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
     await store.save()
   },
   leftSidebarTab: 'files',
-  setLeftSidebarTab: async (tab: 'files' | 'notes' | 'outline') => {
+  setLeftSidebarTab: async (tab: 'files' | 'notes') => {
     set({ leftSidebarTab: tab })
     localStorage.setItem('leftSidebarTab', tab)
     const store = await Store.load('store.json')
@@ -148,7 +160,7 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
     const leftState = await store.get<boolean>('leftSidebarVisible')
     const centerState = await store.get<boolean>('centerPanelVisible')
     const rightState = await store.get<boolean>('rightSidebarVisible')
-    const leftTab = await store.get<'files' | 'notes' | 'outline'>('leftSidebarTab')
+    const leftTab = await store.get<'files' | 'notes'>('leftSidebarTab')
     
     if (leftState !== null && leftState !== undefined) {
       set({ leftSidebarVisible: leftState })

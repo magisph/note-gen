@@ -12,6 +12,7 @@ import type {
   ScriptExecutionResult,
   SkillScript,
 } from './types'
+import { resolveSkillDirectory, resolveScriptRelativePath, buildShellCommand } from './path-utils'
 
 // ============================================================================
 // SkillExecutor 类
@@ -156,7 +157,7 @@ export class SkillExecutor {
       if (skill.scripts && skill.scripts.length > 0) {
         sections.push('**Available Scripts**:')
         for (const script of skill.scripts) {
-          sections.push(`  - ${script.name} (${script.type})`)
+          sections.push(`  - \`${script.name}\` (${script.type})`)
         }
         sections.push('')
       }
@@ -203,6 +204,8 @@ export class SkillExecutor {
     scriptName: string,
     args?: string[]
   ): Promise<ScriptExecutionResult> {
+    const startTime = Date.now()
+
     // 查找脚本
     const script = skill.scripts.find(s => s.name === scriptName)
     if (!script) {
@@ -210,29 +213,32 @@ export class SkillExecutor {
         success: false,
         scriptName,
         error: `Script "${scriptName}" not found in skill "${skill.metadata.name}"`,
-        executionTime: 0,
+        executionTime: Date.now() - startTime,
       }
     }
 
-    const startTime = Date.now()
-
     try {
       // 根据脚本类型执行
-      const result = await this.executeScriptByType(script, args)
+      const result = await this.executeScriptByType(script, args, skill)
+
+      const executionTime = Date.now() - startTime
 
       return {
         success: true,
         scriptName,
         output: result.output,
         exitCode: result.exitCode,
-        executionTime: Date.now() - startTime,
+        executionTime,
       }
     } catch (error) {
+      const executionTime = Date.now() - startTime
+      const errorMessage = error instanceof Error ? error.message : String(error)
+
       return {
         success: false,
         scriptName,
-        error: error instanceof Error ? error.message : String(error),
-        executionTime: Date.now() - startTime,
+        error: errorMessage,
+        executionTime,
       }
     }
   }
@@ -242,40 +248,61 @@ export class SkillExecutor {
    */
   private async executeScriptByType(
     script: SkillScript,
-    args?: string[]
+    args?: string[],
+    skill?: SkillContent
   ): Promise<{ output: string; exitCode: number }> {
     // 注意：在 Tauri 环境中，脚本执行需要通过 Command API
-    // 这里提供基本的接口，实际实现需要根据具体环境调整
 
     const { Command } = await import('@tauri-apps/plugin-shell')
 
     let command: string
-    let commandArgs: string[] = []
 
+    // 根据脚本类型确定解释器命令
+    // 优先使用 'python3'，如果不存在则回退到 'python'
     switch (script.type) {
       case 'python':
         command = 'python3'
-        commandArgs = [script.path, ...(args || [])]
         break
       case 'bash':
       case 'shell':
         command = 'bash'
-        commandArgs = [script.path, ...(args || [])]
         break
       case 'node':
       case 'javascript':
         command = 'node'
-        commandArgs = [script.path, ...(args || [])]
         break
       default:
         throw new Error(`Unsupported script type: ${script.type}`)
     }
 
-    // 执行命令
-    const result = await Command.create(command, commandArgs).execute()
+    // 如果没有 skill 信息，抛出错误而不是静默失败
+    if (!skill) {
+      throw new Error('Skill information is required to execute script')
+    }
+
+    // 获取 skill 文件信息
+    const fileInfo = await import('@/lib/skills').then(m => m.skillManager.getSkillFileInfo(skill.metadata.id))
+    if (!fileInfo) {
+      throw new Error(`Cannot find skill file info for: ${skill.metadata.id}`)
+    }
+
+    // 使用统一的路径解析函数
+    const workingDirectory = await resolveSkillDirectory(fileInfo.directory, skill.metadata.scope)
+
+    // 使用统一的脚本路径解析函数
+    const skillBaseName = fileInfo.directory.split('/').pop() || skill.metadata.id
+    const relativeScriptPath = resolveScriptRelativePath(script.path, skillBaseName)
+
+    // 使用参数转义函数
+    const shellCommand = buildShellCommand(workingDirectory, workingDirectory, command, [relativeScriptPath, ...(args || [])])
+
+    const result = await Command.create('bash', ['-c', shellCommand]).execute()
+
+    // 合并 stdout 和 stderr，确保不丢失任何输出
+    const output = result.stdout + result.stderr
 
     return {
-      output: result.stdout || result.stderr,
+      output: output || '',
       exitCode: result.code ?? 0,
     }
   }

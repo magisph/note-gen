@@ -3,6 +3,8 @@ import { Store } from '@tauri-apps/plugin-store';
 import { v4 as uuid } from 'uuid';
 import { GithubError, GithubRepoInfo, OctokitResponse } from './github.types';
 import { fetch, Proxy } from '@tauri-apps/plugin-http'
+import { buildRepoContentPath, buildRepoContentsEndpoint, debugSyncPath } from './remote-file'
+export { decodeBase64ToString } from './remote-file';
 
 export function uint8ArrayToBase64(data: Uint8Array) {
   return Buffer.from(data).toString('base64');
@@ -20,12 +22,6 @@ export async function fileToBase64(file: File) {
     }
     reader.onerror = error => reject(error);
   });
-}
-
-export function decodeBase64ToString(str: string){
-  return decodeURIComponent(atob(str).split('').map(function (c) {
-    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
 }
 
 export interface GithubFile {
@@ -48,9 +44,31 @@ interface Links {
   html: string;
 }
 
+export interface GithubRelease {
+  name?: string | null;
+  tag_name?: string | null;
+  body?: string | null;
+  published_at?: string | null;
+  html_url?: string | null;
+  draft?: boolean;
+  prerelease?: boolean;
+}
+
+interface GithubReleasesCache {
+  updatedAt: number;
+  releases: GithubRelease[];
+}
+
+interface GetReleasesOptions {
+  forceRefresh?: boolean;
+}
+
+const GITHUB_RELEASES_CACHE_KEY = 'githubReleasesCache';
+const GITHUB_RELEASES_CACHE_TTL_MS = 1000 * 60 * 30;
+
 export async function uploadFile(
-  { ext, file, filename, sha, message, repo, path }:
-  { ext: string, file: string, filename?: string, sha?: string, message?: string, repo: string, path?: string }) 
+  { file, filename, sha, message, repo, path }:
+  { file: string, filename?: string, sha?: string, message?: string, repo: string, path?: string })
 {
   const store = await Store.load('store.json');
   const accessToken = await store.get('accessToken')
@@ -64,37 +82,37 @@ export async function uploadFile(
   } : undefined
   
   try {
-    let _filename = ''
-    if (filename) {
-      _filename = `${filename}`
-    } else {
-      _filename = `${id}.${ext}`
-    }
-    // 将空格转换成下划线
-    _filename = encodeURIComponent(_filename.replace(/\s/g, '_'))
-    const _path = path ? `/${path}`: ''
-    
+    const contentPath = buildRepoContentPath({ path, filename })
+    debugSyncPath('github.uploadFile', {
+      inputPath: path,
+      filename,
+      contentPath,
+    })
+
+    // 将内容转换为 Base64（GitHub API 要求）
+    const base64Content = Buffer.from(file, 'utf-8').toString('base64')
+
     // 设置请求头
     const headers = new Headers();
     headers.append('Authorization', `Bearer ${accessToken}`);
     headers.append('Accept', 'application/vnd.github+json');
     headers.append('X-GitHub-Api-Version', '2022-11-28');
     headers.append('Content-Type', 'application/json');
-    
+
     const requestOptions = {
       method: 'PUT',
       headers,
       body: JSON.stringify({
         message: message || `Upload ${filename || id}`,
-        content: file,
+        content: base64Content,
         sha
       }),
       proxy
     };
-    
-    const url = `https://api.github.com/repos/${githubUsername}/${repo}/contents${_path}/${_filename}`;
+
+    const url = `https://api.github.com/repos/${githubUsername}/${repo}${buildRepoContentsEndpoint(contentPath)}`;
     const response = await fetch(url, requestOptions);
-    
+
     if (response.status >= 200 && response.status < 300) {
       const data = await response.json();
       return { data } as OctokitResponse<any>;
@@ -103,7 +121,7 @@ export async function uploadFile(
     if (response.status === 400) {
       return null;
     }
-    
+
     const errorData = await response.json();
     throw {
       status: response.status,
@@ -122,16 +140,21 @@ export async function getFiles({ path, repo, ref }: { path: string, repo: string
   const store = await Store.load('store.json');
   const accessToken = await store.get('accessToken')
   if (!accessToken) return;
-  
+
   const githubUsername = await store.get('githubUsername')
-  path = encodeURIComponent(path.replace(/\s/g, '_'))
-  
+
+  const encodedPath = buildRepoContentPath({ path })
+  debugSyncPath('github.getFiles', {
+    inputPath: path,
+    encodedPath,
+  })
+
   // 获取代理设置
   const proxyUrl = await store.get<string>('proxy')
   const proxy: Proxy | undefined = proxyUrl ? {
     all: proxyUrl
   } : undefined
-  
+
   try {
     // 设置请求头
     const headers = new Headers();
@@ -139,16 +162,16 @@ export async function getFiles({ path, repo, ref }: { path: string, repo: string
     headers.append('Accept', 'application/vnd.github+json');
     headers.append('X-GitHub-Api-Version', '2022-11-28');
     headers.append('If-None-Match', '');
-    
+
     const requestOptions = {
       method: 'GET',
       headers,
       proxy
     };
-    
+
     // 如果有 ref 参数，添加到 URL 查询参数中
     const refParam = ref ? `?ref=${ref}` : '';
-    const url = `https://api.github.com/repos/${githubUsername}/${repo}/contents/${path}${refParam}`;
+    const url = `https://api.github.com/repos/${githubUsername}/${repo}/contents/${encodedPath}${refParam}`;
     
     try {
       const response = await fetch(url, requestOptions);
@@ -205,34 +228,18 @@ export async function deleteFile(
       proxy
     };
 
-    // 分离路径和文件名，只对路径部分进行编码，保留文件名的原始字符
-    const lastSlashIndex = path.lastIndexOf('/')
-    const dirPath = lastSlashIndex > 0 ? path.substring(0, lastSlashIndex) : ''
-    const fileName = lastSlashIndex > 0 ? path.substring(lastSlashIndex + 1) : path
-
-    // 对目录路径进行编码，但保留文件名不变
-    const encodedPath = dirPath ? encodeURIComponent(dirPath) + '/' + fileName : fileName
-
-    const url = `https://api.github.com/repos/${githubUsername}/${repo}/contents/${encodedPath}`;
+    const encodedPath = buildRepoContentPath({ path, preserveWhitespace: true })
+    const url = `https://api.github.com/repos/${githubUsername}/${repo}${buildRepoContentsEndpoint(encodedPath)}`;
     const response = await fetch(url, requestOptions);
     
     if (response.status >= 200 && response.status < 300) {
       const data = await response.json();
       return data;
     }
-    
-    // 输出详细的错误信息
-    const errorText = await response.text();
-    console.error('GitHub delete file error:', {
-      status: response.status,
-      statusText: response.statusText,
-      url: url,
-      body: errorText
-    });
+
     throw new Error(`删除文件失败: ${response.status} ${response.statusText}`);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    console.error('GitHub delete file failed:', error);
     return false
   }
 }
@@ -242,16 +249,15 @@ export async function getFileCommits({ path, repo }: { path: string, repo: strin
   const store = await Store.load('store.json');
   const accessToken = await store.get('accessToken')
   if (!accessToken) return;
-  
+
   const githubUsername = await store.get('githubUsername')
-  path = encodeURIComponent(path.replace(/\s/g, '_'))
-  
+
   // 获取代理设置
   const proxyUrl = await store.get<string>('proxy')
   const proxy: Proxy | undefined = proxyUrl ? {
     all: proxyUrl
   } : undefined
-  
+
   try {
     // 设置请求头
     const headers = new Headers();
@@ -259,19 +265,28 @@ export async function getFileCommits({ path, repo }: { path: string, repo: strin
     headers.append('Accept', 'application/vnd.github+json');
     headers.append('X-GitHub-Api-Version', '2022-11-28');
     headers.append('If-None-Match', '');
-    
+
     const requestOptions = {
       method: 'GET',
       headers,
       proxy
     };
     
-    const url = `https://api.github.com/repos/${githubUsername}/${repo}/commits?path=${path}`;
+    const commitPath = encodeURIComponent(path)
+    debugSyncPath('github.getFileCommits', {
+      inputPath: path,
+      commitPath,
+    })
+    const url = `https://api.github.com/repos/${githubUsername}/${repo}/commits?path=${commitPath}&per_page=100`;
     const response = await fetch(url, requestOptions);
-    
+
     if (response.status >= 200 && response.status < 300) {
       const data = await response.json();
       return data;
+    }
+
+    if (response.status === 404) {
+      return [];
     }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
@@ -401,10 +416,9 @@ export async function createSyncRepo(name: string, isPrivate?: boolean) {
 }
 
 // 读取 release
-export async function getRelease() {
+export async function getRelease(): Promise<GithubRelease | false | undefined> {
   const store = await Store.load('store.json');
-  const accessToken = await store.get('accessToken')
-  if (!accessToken) return;
+  const accessToken = await store.get<string>('accessToken')
   
   // 获取代理设置
   const proxyUrl = await store.get<string>('proxy')
@@ -415,7 +429,9 @@ export async function getRelease() {
   try {
     // 设置请求头
     const headers = new Headers();
-    headers.append('Authorization', `Bearer ${accessToken}`);
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`);
+    }
     headers.append('Accept', 'application/vnd.github+json');
     headers.append('X-GitHub-Api-Version', '2022-11-28');
     headers.append('If-None-Match', '');
@@ -430,13 +446,73 @@ export async function getRelease() {
     const response = await fetch(url, requestOptions);
     
     if (response.status >= 200 && response.status < 300) {
-      const data = await response.json();
+      const data = await response.json() as GithubRelease;
       return data;
     }
     
     throw new Error('获取 release 失败');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
+    return false
+  }
+}
+
+// 读取 release 列表
+export async function getReleases(options: GetReleasesOptions = {}): Promise<GithubRelease[] | false | undefined> {
+  const store = await Store.load('store.json');
+  const accessToken = await store.get<string>('accessToken')
+  const cachedReleases = await store.get<GithubReleasesCache>(GITHUB_RELEASES_CACHE_KEY)
+
+  if (
+    !options.forceRefresh &&
+    cachedReleases?.releases?.length &&
+    Date.now() - cachedReleases.updatedAt < GITHUB_RELEASES_CACHE_TTL_MS
+  ) {
+    return cachedReleases.releases;
+  }
+
+  // 获取代理设置
+  const proxyUrl = await store.get<string>('proxy')
+  const proxy: Proxy | undefined = proxyUrl ? {
+    all: proxyUrl
+  } : undefined
+
+  try {
+    // 设置请求头
+    const headers = new Headers();
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`);
+    }
+    headers.append('Accept', 'application/vnd.github+json');
+    headers.append('X-GitHub-Api-Version', '2022-11-28');
+    headers.append('If-None-Match', '');
+
+    const requestOptions = {
+      method: 'GET',
+      headers,
+      proxy
+    };
+
+    const url = `https://api.github.com/repos/codexu/note-gen/releases?per_page=100`;
+    const response = await fetch(url, requestOptions);
+
+    if (response.status >= 200 && response.status < 300) {
+      const data = await response.json() as GithubRelease[];
+      await store.set(GITHUB_RELEASES_CACHE_KEY, {
+        updatedAt: Date.now(),
+        releases: data
+      } satisfies GithubReleasesCache);
+      await store.save();
+      return data;
+    }
+
+    throw new Error('获取 release 列表失败');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    if (cachedReleases?.releases?.length) {
+      return cachedReleases.releases;
+    }
+
     return false
   }
 }

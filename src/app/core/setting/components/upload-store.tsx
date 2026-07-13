@@ -6,6 +6,7 @@ import { getFiles as giteeGetFiles, uploadFile as uploadGiteeFile } from "@/lib/
 import { uploadFile as uploadGitlabFile, getFiles as gitlabGetFiles, getFileContent as gitlabGetFileContent } from "@/lib/sync/gitlab";
 import { uploadFile as uploadGiteaFile, getFiles as giteaGetFiles, getFileContent as giteaGetFileContent } from "@/lib/sync/gitea";
 import { getSyncRepoName } from "@/lib/sync/repo-utils";
+import { getRemoteFileContent } from "@/lib/sync/remote-file";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { isMobileDevice } from "@/lib/check";
@@ -30,14 +31,15 @@ export default function UploadStore() {
     
     // 读取并过滤配置
     const store = await Store.load('store.json');
-    const allSettings: Record<string, any> = {}
+    const allSettings: Record<string, unknown> = {}
     const entries = await store.entries()
     for (const [key, value] of entries) {
       allSettings[key] = value
     }
+    const excludeSensitiveConfig = await store.get<boolean>('excludeSensitiveConfig') !== false
     
     // 过滤掉不应同步的字段（如工作区路径等）
-    const syncableSettings = filterSyncData(allSettings)
+    const syncableSettings = filterSyncData(allSettings, { excludeSensitiveConfig })
     const filteredContent = JSON.stringify(syncableSettings, null, 2)
     const file = new TextEncoder().encode(filteredContent)
     
@@ -49,7 +51,6 @@ export default function UploadStore() {
         const githubRepo = await getSyncRepoName('github')
         files = await githubGetFiles({ path: `${path}/${filename}`, repo: githubRepo })
         res = await uploadGithubFile({
-          ext: 'json',
           file: uint8ArrayToBase64(file),
           repo: githubRepo,
           path,
@@ -61,7 +62,6 @@ export default function UploadStore() {
         const giteeRepo = await getSyncRepoName('gitee')
         files = await giteeGetFiles({ path: `${path}/${filename}`, repo: giteeRepo })
         res = await uploadGiteeFile({
-          ext: 'json',
           file: uint8ArrayToBase64(file),
           repo: giteeRepo,
           path,
@@ -76,7 +76,6 @@ export default function UploadStore() {
           ? files.find(file => file.name === filename)
           : (files?.name === filename ? files : undefined)
         res = await uploadGitlabFile({
-          ext: 'json',
           file: uint8ArrayToBase64(file),
           repo: gitlabRepo,
           path,
@@ -87,11 +86,10 @@ export default function UploadStore() {
       case 'gitea':
         const giteaRepo = await getSyncRepoName('gitea')
         files = await giteaGetFiles({ path, repo: giteaRepo })
-        const giteaStoreFile = Array.isArray(files) 
+        const giteaStoreFile = Array.isArray(files)
           ? files.find(file => file.name === filename)
           : (files?.name === filename ? files : undefined)
         res = await uploadGiteaFile({
-          ext: 'json',
           file: uint8ArrayToBase64(file),
           repo: giteaRepo,
           path,
@@ -117,11 +115,12 @@ export default function UploadStore() {
     const store = await Store.load('store.json');
     
     // 获取本地配置（用于保留排除字段）
-    const localSettings: Record<string, any> = {}
+    const localSettings: Record<string, unknown> = {}
     const entries = await store.entries()
     for (const [key, value] of entries) {
       localSettings[key] = value
     }
+    const excludeSensitiveConfig = await store.get<boolean>('excludeSensitiveConfig') !== false
     
     const primaryBackupMethod = await store.get('primaryBackupMethod')
     let file;
@@ -144,11 +143,11 @@ export default function UploadStore() {
         break;
     }
     if (file) {
-      const configJson = decodeBase64ToString(file.content)
+      const configJson = decodeBase64ToString(getRemoteFileContent(file, `${path}/${filename}`))
       const remoteSettings = JSON.parse(configJson)
       
       // 合并配置：使用远程配置，但保留本地的排除字段（如工作区路径等）
-      const mergedSettings = mergeSyncData(localSettings, remoteSettings)
+      const mergedSettings = mergeSyncData(localSettings, remoteSettings, { excludeSensitiveConfig })
       
       // 保存合并后的配置
       const keys = Object.keys(mergedSettings)

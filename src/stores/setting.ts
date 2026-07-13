@@ -8,6 +8,14 @@ import { noteGenDefaultModels, noteGenModelKeys } from '@/app/model-config'
 import { fetch } from '@tauri-apps/plugin-http'
 import { CustomThemeColors } from '@/types/theme'
 import { applyThemeColors, removeThemeColors } from '@/lib/theme-utils'
+import { getNormalizedImageHosting } from '@/lib/image-hosting-config'
+import { normalizeSpeechMode } from '@/lib/speech/preferences'
+import type { SpeechMode } from '@/lib/speech/types'
+import { applyNoteGenDefaultConfig, loadNoteGenDefaultConfig } from '@/lib/ai/notegen-default-models-runtime'
+import { enqueueAutoDataSync, isAutoDataSyncApplyingRemote } from '@/lib/sync/auto-data-sync-queue'
+import { shouldExcludeFromSync } from '@/config/sync-exclusions'
+import { DEFAULT_SYSTEM_PROMPT } from '@/lib/ai/system-prompt'
+import { APP_FONT_SYSTEM_VALUE, applyAppFontFamily } from '@/lib/font-settings'
 
 export enum GenTemplateRange {
   All = 'all',
@@ -37,6 +45,9 @@ interface SettingState {
 
   language: string
   setLanguage: (language: string) => void
+
+  appFontFamily: string
+  setAppFontFamily: (fontFamily: string) => Promise<void>
 
   // setting - ai - 当前选择的模型 key
   currentAi: string
@@ -75,6 +86,21 @@ interface SettingState {
   sttModel: string
   setSttModel: (sttModel: string) => Promise<void>
 
+  textToSpeechMode: SpeechMode
+  setTextToSpeechMode: (mode: SpeechMode) => Promise<void>
+
+  speechToTextMode: SpeechMode
+  setSpeechToTextMode: (mode: SpeechMode) => Promise<void>
+
+  condenseModel: string
+  setCondenseModel: (condenseModel: string) => Promise<void>
+
+  inspirationModel: string
+  setInspirationModel: (inspirationModel: string) => Promise<void>
+
+  systemPrompt: string
+  setSystemPrompt: (systemPrompt: string) => Promise<void>
+
   templateList: GenTemplate[]
   setTemplateList: (templateList: GenTemplate[]) => Promise<void>
 
@@ -86,9 +112,6 @@ interface SettingState {
 
   codeTheme: string
   setCodeTheme: (codeTheme: string) => void
-
-  tesseractList: string
-  setTesseractList: (tesseractList: string) => void
 
   // Github 相关设置
   githubUsername: string
@@ -105,6 +128,19 @@ interface SettingState {
 
   autoSync: string
   setAutoSync: (autoSync: string) => Promise<void>
+
+  autoDataSyncEnabled: boolean
+  setAutoDataSyncEnabled: (enabled: boolean) => Promise<void>
+
+  excludeSensitiveConfig: boolean
+  setExcludeSensitiveConfig: (enabled: boolean) => Promise<void>
+
+  // 自动拉取相关设置
+  autoPullOnOpen: boolean
+  setAutoPullOnOpen: (autoPullOnOpen: boolean) => Promise<void>
+
+  autoPullOnSwitch: boolean
+  setAutoPullOnSwitch: (autoPullOnSwitch: boolean) => Promise<void>
 
   // Gitee 相关设置
   giteeAccessToken: string
@@ -146,8 +182,8 @@ interface SettingState {
   setGiteaUsername: (giteaUsername: string) => Promise<void>
 
   // 主要备份方式设置
-  primaryBackupMethod: 'github' | 'gitee' | 'gitlab' | 'gitea'
-  setPrimaryBackupMethod: (method: 'github' | 'gitee' | 'gitlab' | 'gitea') => Promise<void>
+  primaryBackupMethod: 'github' | 'gitee' | 'gitlab' | 'gitea' | 's3' | 'webdav'
+  setPrimaryBackupMethod: (method: 'github' | 'gitee' | 'gitlab' | 'gitea' | 's3' | 'webdav') => Promise<void>
 
   lastSettingPage: string
   setLastSettingPage: (page: string) => Promise<void>
@@ -187,8 +223,6 @@ interface SettingState {
   // 图片识别设置
   enableImageRecognition: boolean
   setEnableImageRecognition: (enable: boolean) => Promise<void>
-  primaryImageMethod: 'ocr' | 'vlm'
-  setPrimaryImageMethod: (method: 'ocr' | 'vlm') => Promise<void>
 
   // 界面缩放设置
   uiScale: number
@@ -223,9 +257,17 @@ interface SettingState {
   recordToolbarConfig: RecordToolbarItem[]
   setRecordToolbarConfig: (config: RecordToolbarItem[]) => Promise<void>
 
-  // 托盘设置
-  trayEnabled: boolean
-  setTrayEnabled: (enabled: boolean) => Promise<void>
+  // 编辑器撤销/重做按钮显示设置
+  showEditorUndoRedo: boolean
+  setShowEditorUndoRedo: (show: boolean) => Promise<void>
+
+  // 摘要设置
+  enableCondense: boolean
+  setEnableCondense: (enabled: boolean) => Promise<void>
+  keepLatestCount: number
+  setKeepLatestCount: (count: number) => Promise<void>
+  condenseMaxLength: number
+  setCondenseMaxLength: (length: number) => Promise<void>
 }
 
 export interface ChatToolbarItem {
@@ -240,12 +282,72 @@ export interface RecordToolbarItem {
   order: number
 }
 
+let settingAutoSyncReady = false
+let settingAutoSyncSubscriptionInitialized = false
+
+function getChangedSyncableSettingKeys(current: SettingState, previous: SettingState): string[] {
+  const currentRecord = current as unknown as Record<string, unknown>
+  const previousRecord = previous as unknown as Record<string, unknown>
+  const excludeSensitiveConfig = current.excludeSensitiveConfig !== false
+
+  return Object.keys(currentRecord).filter((key) => {
+    if (typeof currentRecord[key] === 'function') {
+      return false
+    }
+
+    if (shouldExcludeFromSync(key, { excludeSensitiveConfig })) {
+      return false
+    }
+
+    return currentRecord[key] !== previousRecord[key]
+  })
+}
+
+function initSettingAutoSyncSubscription() {
+  if (settingAutoSyncSubscriptionInitialized) {
+    return
+  }
+
+  settingAutoSyncSubscriptionInitialized = true
+
+  useSettingStore.subscribe((current, previous) => {
+    if (!settingAutoSyncReady || isAutoDataSyncApplyingRemote()) {
+      return
+    }
+
+    const changedKeys = getChangedSyncableSettingKeys(current, previous)
+    if (changedKeys.length === 0) {
+      return
+    }
+
+    void persistChangedSyncableSettings(current, changedKeys)
+  })
+}
+
+async function persistChangedSyncableSettings(state: SettingState, changedKeys: string[]) {
+  const store = await Store.load('store.json')
+  const stateRecord = state as unknown as Record<string, unknown>
+
+  for (const key of changedKeys) {
+    await store.set(key, stateRecord[key])
+  }
+
+  await store.save()
+  enqueueAutoDataSync('settings', `settings:${changedKeys.join(',')}`)
+}
+
 
 const useSettingStore = create<SettingState>((set, get) => ({
   initSettingData: async () => {
     const store = await Store.load('store.json');
     await get().setVersion()
-    
+
+    // 初始化图床配置
+    const savedUseImageRepo = await store.get<boolean>('useImageRepo')
+    if (savedUseImageRepo !== undefined && savedUseImageRepo !== null) {
+      set({ useImageRepo: savedUseImageRepo })
+    }
+
     // 初始化默认的NoteGen模型配置
     const existingAiModelList = (await store.get('aiModelList') as AiConfig[]) || []
     const hasNoteGenModels = existingAiModelList.some(config => 
@@ -254,9 +356,9 @@ const useSettingStore = create<SettingState>((set, get) => ({
       config.models?.some(model => noteGenModelKeys.includes(model.id))
     )
     
-    let finalAiModelList = existingAiModelList
-    if (!hasNoteGenModels) {
-      finalAiModelList = [...existingAiModelList, ...noteGenDefaultModels]
+    const noteGenDefaultConfig = await loadNoteGenDefaultConfig(noteGenDefaultModels[0])
+    let finalAiModelList = applyNoteGenDefaultConfig(existingAiModelList, noteGenDefaultConfig)
+    if (JSON.stringify(finalAiModelList) !== JSON.stringify(existingAiModelList)) {
       await store.set('aiModelList', finalAiModelList)
       set({ aiModelList: finalAiModelList })
     }
@@ -292,23 +394,6 @@ const useSettingStore = create<SettingState>((set, get) => ({
       } else {
         await store.set('embeddingModel', 'note-gen-embedding')
         set({ embeddingModel: 'note-gen-embedding' })
-      }
-    }
-
-    // 检查是否设置了视觉语言模型，如果没有且存在note-gen-vlm，则设置为默认视觉语言模型
-    const currentImageMethodModel = await store.get('imageMethodModel') as string
-    const hasNoteGenVlm = finalAiModelList.some(config => 
-      config.models?.some(model => model.id === 'note-gen-vlm') || config.key === 'note-gen-vlm'
-    )
-    
-    if (!currentImageMethodModel && hasNoteGenVlm) {
-      const noteGenFreeConfig = finalAiModelList.find(config => config.key === 'note-gen-free')
-      if (noteGenFreeConfig?.models?.some(model => model.id === 'note-gen-vlm')) {
-        await store.set('imageMethodModel', 'note-gen-vlm')
-        set({ imageMethodModel: 'note-gen-vlm' })
-      } else {
-        await store.set('imageMethodModel', 'note-gen-vlm')
-        set({ imageMethodModel: 'note-gen-vlm' })
       }
     }
 
@@ -360,11 +445,19 @@ const useSettingStore = create<SettingState>((set, get) => ({
       }
     }
 
+    const currentTextToSpeechMode = await store.get('textToSpeechMode')
+    set({ textToSpeechMode: normalizeSpeechMode(currentTextToSpeechMode) })
+
+    const currentSpeechToTextMode = await store.get('speechToTextMode')
+    set({ speechToTextMode: normalizeSpeechMode(currentSpeechToTextMode) })
+
     // 检查并初始化其他模型类型
     const modelTypes = [
       { storeKey: 'completionModel', modelType: 'chat' },
       { storeKey: 'markDescModel', modelType: 'chat' },
-      { storeKey: 'commitModel', modelType: 'chat' }
+      { storeKey: 'commitModel', modelType: 'chat' },
+      { storeKey: 'condenseModel', modelType: 'chat' },
+      { storeKey: 'inspirationModel', modelType: 'chat' }
     ]
 
     for (const { storeKey, modelType } of modelTypes) {
@@ -374,7 +467,7 @@ const useSettingStore = create<SettingState>((set, get) => ({
         const noteGenFreeConfig = finalAiModelList.find(config => config.key === 'note-gen-free')
         if (noteGenFreeConfig?.models?.some(model => model.id === 'note-gen-chat' && model.modelType === modelType)) {
           await store.set(storeKey, 'note-gen-chat')
-          set({ [storeKey.replace('Model', '')]: 'note-gen-chat' })
+          set({ [storeKey]: 'note-gen-chat' })
         } else {
           // 查找其他可用的聊天模型
           for (const config of finalAiModelList) {
@@ -382,12 +475,12 @@ const useSettingStore = create<SettingState>((set, get) => ({
               const chatModel = config.models.find(model => model.modelType === modelType)
               if (chatModel) {
                 await store.set(storeKey, `${config.key}-${chatModel.id}`)
-                set({ [storeKey.replace('Model', '')]: `${config.key}-${chatModel.id}` })
+                set({ [storeKey]: `${config.key}-${chatModel.id}` })
                 break
               }
             } else if (config.modelType === modelType || !config.modelType) {
               await store.set(storeKey, config.key)
-              set({ [storeKey.replace('Model', '')]: config.key })
+              set({ [storeKey]: config.key })
               break
             }
           }
@@ -424,7 +517,8 @@ const useSettingStore = create<SettingState>((set, get) => ({
         // 过滤出不在默认模型中的限时免费模型
         const limitedModels = resModels.data.filter((model: any) => {
           // 检查是否在 noteGenDefaultModels 的 models 数组中
-          return !noteGenDefaultModels[0].models?.some(defaultModel => defaultModel.model === model.id)
+          const noteGenFreeConfig = finalAiModelList.find(config => config.key === 'note-gen-free')
+          return !noteGenFreeConfig?.models?.some(defaultModel => defaultModel.model === model.id)
         })
         
         // 如果有限时免费模型,创建统一的 NoteGen Limited 配置
@@ -454,7 +548,7 @@ const useSettingStore = create<SettingState>((set, get) => ({
       console.debug('NoteGen API service unavailable, skipping limited models:', error)
     }
 
-    Object.entries(get()).forEach(async ([key, value]) => {
+    await Promise.all(Object.entries(get()).map(async ([key, value]) => {
       const res = await store.get(key)
 
       if (typeof value === 'function') return
@@ -491,13 +585,40 @@ const useSettingStore = create<SettingState>((set, get) => ({
           } else {
             set({ [key]: res as RecordToolbarItem[] })
           }
+        } else if (key === 'chatToolbarConfigPc' || key === 'chatToolbarConfigMobile') {
+          // 确保聊天工具栏包含所有工具，如果缺少新工具则自动添加
+          const storedConfig = res as ChatToolbarItem[]
+          const defaultConfig = value as ChatToolbarItem[]
+
+          // 检查是否有缺失的工具
+          const missingTools = defaultConfig.filter(
+            defaultItem => !storedConfig.some(stored => stored.id === defaultItem.id)
+          )
+
+          if (missingTools.length > 0) {
+            // 合并配置：保留用户的顺序和启用状态，添加新工具
+            const mergedConfig = [...storedConfig]
+            let maxOrder = Math.max(...storedConfig.map(item => item.order), 0)
+
+            missingTools.forEach(tool => {
+              mergedConfig.push({ ...tool, order: ++maxOrder })
+            })
+
+            await store.set(key, mergedConfig)
+            set({ [key]: mergedConfig })
+          } else {
+            set({ [key]: res as ChatToolbarItem[] })
+          }
         } else if (key !== 'aiModelList') {
           set({ [key]: res })
         }
       } else {
         await store.set(key, value)
       }
-    })
+    }))
+
+    initSettingAutoSyncSubscription()
+    settingAutoSyncReady = true
   },
 
   version: '',
@@ -511,6 +632,15 @@ const useSettingStore = create<SettingState>((set, get) => ({
 
   language: '简体中文',
   setLanguage: (language) => set({ language }),
+
+  appFontFamily: APP_FONT_SYSTEM_VALUE,
+  setAppFontFamily: async (fontFamily) => {
+    set({ appFontFamily: fontFamily })
+    applyAppFontFamily(fontFamily)
+    const store = await Store.load('store.json')
+    await store.set('appFontFamily', fontFamily)
+    await store.save()
+  },
 
   currentAi: '',
   setCurrentAi: (currentAi) => set({ currentAi }),
@@ -584,6 +714,44 @@ const useSettingStore = create<SettingState>((set, get) => ({
     set({ sttModel })
   },
 
+  textToSpeechMode: 'auto',
+  setTextToSpeechMode: async (mode) => {
+    const normalizedMode = normalizeSpeechMode(mode)
+    const store = await Store.load('store.json')
+    await store.set('textToSpeechMode', normalizedMode)
+    set({ textToSpeechMode: normalizedMode })
+  },
+
+  speechToTextMode: 'auto',
+  setSpeechToTextMode: async (mode) => {
+    const normalizedMode = normalizeSpeechMode(mode)
+    const store = await Store.load('store.json')
+    await store.set('speechToTextMode', normalizedMode)
+    set({ speechToTextMode: normalizedMode })
+  },
+
+  condenseModel: '',
+  setCondenseModel: async (condenseModel) => {
+    const store = await Store.load('store.json');
+    await store.set('condenseModel', condenseModel)
+    set({ condenseModel })
+  },
+
+  inspirationModel: '',
+  setInspirationModel: async (inspirationModel) => {
+    const store = await Store.load('store.json');
+    await store.set('inspirationModel', inspirationModel)
+    set({ inspirationModel })
+  },
+
+  systemPrompt: DEFAULT_SYSTEM_PROMPT,
+  setSystemPrompt: async (systemPrompt) => {
+    set({ systemPrompt })
+    const store = await Store.load('store.json')
+    await store.set('systemPrompt', systemPrompt)
+    await store.save()
+  },
+
   templateList: [
     {
       id: '0',
@@ -618,9 +786,6 @@ const useSettingStore = create<SettingState>((set, get) => ({
   codeTheme: 'github',
   setCodeTheme: (codeTheme) => set({ codeTheme }),
 
-  tesseractList: 'eng,chi_sim',
-  setTesseractList: (tesseractList) => set({ tesseractList }),
-
   githubUsername: '',
   setGithubUsername: async (githubUsername) => {
     set({ githubUsername })
@@ -650,16 +815,76 @@ const useSettingStore = create<SettingState>((set, get) => ({
     set({ useImageRepo })
     const store = await Store.load('store.json');
     await store.set('useImageRepo', useImageRepo)
+    if (useImageRepo) {
+      const normalizedImageHosting = getNormalizedImageHosting(await store.get<string>('mainImageHosting'))
+      if (normalizedImageHosting.shouldPersist) {
+        await store.set('mainImageHosting', normalizedImageHosting.value)
+      }
+    }
+    await store.save()
   },
 
-  autoSync: 'disabled',
+  autoSync: '5',
   setAutoSync: async (autoSync: string) => {
     set({ autoSync })
     const store = await Store.load('store.json');
     await store.set('autoSync', autoSync)
   },
 
-  lastSettingPage: 'ai',
+  autoDataSyncEnabled: true,
+  setAutoDataSyncEnabled: async (autoDataSyncEnabled: boolean) => {
+    set({ autoDataSyncEnabled })
+    const store = await Store.load('store.json')
+    await store.set('autoDataSyncEnabled', autoDataSyncEnabled)
+    await store.save()
+  },
+
+  excludeSensitiveConfig: true,
+  setExcludeSensitiveConfig: async (excludeSensitiveConfig: boolean) => {
+    set({ excludeSensitiveConfig })
+    const store = await Store.load('store.json')
+    await store.set('excludeSensitiveConfig', excludeSensitiveConfig)
+    await store.save()
+
+    if (!isAutoDataSyncApplyingRemote()) {
+      enqueueAutoDataSync('settings', 'settings:exclude-sensitive-config')
+    }
+  },
+
+  // 自动拉取相关设置 - 默认开启
+  autoPullOnOpen: true,
+  setAutoPullOnOpen: async (autoPullOnOpen: boolean) => {
+    set({ autoPullOnOpen })
+    const store = await Store.load('store.json');
+    await store.set('autoPullOnOpen', autoPullOnOpen)
+
+    // 同步更新 sync-manager 的配置
+    try {
+      const { getSyncManager } = await import('@/lib/sync/sync-manager')
+      const manager = getSyncManager()
+      await manager.updateConfig({ autoPullOnOpen })
+    } catch {
+      // 静默处理
+    }
+  },
+
+  autoPullOnSwitch: true,
+  setAutoPullOnSwitch: async (autoPullOnSwitch: boolean) => {
+    set({ autoPullOnSwitch })
+    const store = await Store.load('store.json');
+    await store.set('autoPullOnSwitch', autoPullOnSwitch)
+
+    // 同步更新 sync-manager 的配置
+    try {
+      const { getSyncManager } = await import('@/lib/sync/sync-manager')
+      const manager = getSyncManager()
+      await manager.updateConfig({ autoPullOnSwitch })
+    } catch {
+      // 静默处理
+    }
+  },
+
+  lastSettingPage: 'about',
   setLastSettingPage: async (page: string) => {
     set({ lastSettingPage: page })
     const store = await Store.load('store.json');
@@ -803,7 +1028,7 @@ const useSettingStore = create<SettingState>((set, get) => ({
 
   // 默认使用 GitHub 作为主要备份方式
   primaryBackupMethod: 'github',
-  setPrimaryBackupMethod: async (method: 'github' | 'gitee' | 'gitlab' | 'gitea') => {
+  setPrimaryBackupMethod: async (method: 'github' | 'gitee' | 'gitlab' | 'gitea' | 's3' | 'webdav') => {
     const store = await Store.load('store.json')
     await store.set('primaryBackupMethod', method)
     await store.save()
@@ -833,13 +1058,6 @@ const useSettingStore = create<SettingState>((set, get) => ({
     set({ enableImageRecognition: enable })
     const store = await Store.load('store.json');
     await store.set('enableImageRecognition', enable)
-    await store.save()
-  },
-  primaryImageMethod: 'vlm',
-  setPrimaryImageMethod: async (method: 'ocr' | 'vlm') => {
-    set({ primaryImageMethod: method })
-    const store = await Store.load('store.json');
-    await store.set('primaryImageMethod', method)
     await store.save()
   },
 
@@ -1013,19 +1231,14 @@ const useSettingStore = create<SettingState>((set, get) => ({
 
   // 聊天工具栏配置 - PC 端
   chatToolbarConfigPc: [
-    // 底部工具栏
+    // 底部工具栏（可排序）
     { id: 'modelSelect', enabled: true, order: 0 },
     { id: 'promptSelect', enabled: true, order: 1 },
-    { id: 'chatLanguage', enabled: true, order: 2 },
-    // 顶部工具栏 - 左侧
-    { id: 'chatLink', enabled: true, order: 3 },
-    { id: 'fileLink', enabled: true, order: 4 },
-    { id: 'mcpButton', enabled: true, order: 5 },
-    { id: 'ragSwitch', enabled: true, order: 6 },
-    { id: 'clipboardMonitor', enabled: true, order: 7 },
-    // 顶部工具栏 - 右侧
-    { id: 'clearContext', enabled: true, order: 8 },
-    { id: 'clearChat', enabled: true, order: 9 },
+    { id: 'mcpButton', enabled: true, order: 2 },
+    { id: 'ragSwitch', enabled: true, order: 3 },
+    { id: 'clipboardMonitor', enabled: true, order: 4 },
+    // 顶部工具栏 - 右侧（不参与排序）
+    { id: 'newChat', enabled: true, order: 5 },
   ],
   setChatToolbarConfigPc: async (config: ChatToolbarItem[]) => {
     set({ chatToolbarConfigPc: config })
@@ -1038,14 +1251,10 @@ const useSettingStore = create<SettingState>((set, get) => ({
   chatToolbarConfigMobile: [
     { id: 'modelSelect', enabled: true, order: 0 },
     { id: 'promptSelect', enabled: true, order: 1 },
-    { id: 'chatLanguage', enabled: true, order: 2 },
-    { id: 'chatLink', enabled: true, order: 3 },
-    { id: 'fileLink', enabled: true, order: 4 },
-    { id: 'mcpButton', enabled: true, order: 5 },
-    { id: 'ragSwitch', enabled: true, order: 6 },
-    { id: 'clipboardMonitor', enabled: true, order: 7 },
-    { id: 'clearContext', enabled: true, order: 8 },
-    { id: 'clearChat', enabled: true, order: 9 },
+    { id: 'mcpButton', enabled: true, order: 2 },
+    { id: 'ragSwitch', enabled: true, order: 3 },
+    { id: 'clipboardMonitor', enabled: true, order: 4 },
+    { id: 'newChat', enabled: true, order: 5 },
   ],
   setChatToolbarConfigMobile: async (config: ChatToolbarItem[]) => {
     set({ chatToolbarConfigMobile: config })
@@ -1071,12 +1280,37 @@ const useSettingStore = create<SettingState>((set, get) => ({
     await store.save()
   },
 
-  // 托盘设置
-  trayEnabled: true,
-  setTrayEnabled: async (enabled: boolean) => {
-    set({ trayEnabled: enabled })
+  // 摘要设置
+  enableCondense: true,
+  setEnableCondense: async (enabled: boolean) => {
+    set({ enableCondense: enabled })
     const store = await Store.load('store.json');
-    await store.set('trayEnabled', enabled)
+    await store.set('enableCondense', enabled)
+    await store.save()
+  },
+
+  keepLatestCount: 4,
+  setKeepLatestCount: async (count: number) => {
+    set({ keepLatestCount: count })
+    const store = await Store.load('store.json');
+    await store.set('keepLatestCount', count)
+    await store.save()
+  },
+
+  condenseMaxLength: 100,
+  setCondenseMaxLength: async (length: number) => {
+    set({ condenseMaxLength: length })
+    const store = await Store.load('store.json');
+    await store.set('condenseMaxLength', length)
+    await store.save()
+  },
+
+  // 编辑器撤销/重做按钮显示设置 - 默认开启
+  showEditorUndoRedo: true,
+  setShowEditorUndoRedo: async (show: boolean) => {
+    set({ showEditorUndoRedo: show })
+    const store = await Store.load('store.json');
+    await store.set('showEditorUndoRedo', show)
     await store.save()
   },
 }))
